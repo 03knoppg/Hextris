@@ -20,5 +20,4 @@ public class Hex : MonoBehaviour {
 		transform.Translate(new Vector3(Mathf.Cos(theta) * r * transform.collider.bounds.extents.magnitude, 2,  Mathf.Sin(theta) * r * transform.collider.bounds.extents.magnitude));
 	}
 	
-
 }
