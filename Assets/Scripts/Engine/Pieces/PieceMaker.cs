@@ -23,7 +23,6 @@ public class PieceMaker
 	
 	public static Piece Make(Shape shape){
 		
-		adjacentPositions(10);
 		
 		Piece basePiece = new Piece();
 		

@@ -1,12 +1,8 @@
 using System;
+using UnityEngine;
 
 public static class HexCalcs
 {
-	private HexCalcs ()
-	{
-		
-		
-	}
 	
 	public static int[] adjacentPositions(int position)
 	{
@@ -96,8 +92,8 @@ public static class HexCalcs
 	
 	public static int relativePosition(int p1, int p2)
 	{
-		
-		
+		//TODO!
+		throw new NotImplementedException();
 		
 	}
 }
