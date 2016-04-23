@@ -8,32 +8,14 @@ using System.Collections;
  * circles around a center point. Each ring around the center has 6*r hexes.
  */
 public abstract class Board : MonoBehaviour{
-		
-	
-	protected List<GameObject> hexObjects;
-	
-	
-	void Start(){
-		hexObjects = new List<GameObject>();
-		
-		
-		InitBoard();
-		
-	//	addBoardToScene();
-	}
+
+
+    protected Hex[,] Hexes;
 	
 	
-	protected abstract void InitBoard();
+    public abstract void InitBoard(Layout layout);
 	
-	public void addBoardToScene(){
-		
-		
-		foreach(GameObject hexObj in hexObjects){
-			
-			hexObj.transform.parent = transform;
-			
-		}
-	}
+
 
 
 }

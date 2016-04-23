@@ -5,56 +5,42 @@ using UnityEngine;
 
 public class PieceMaker
 {
-
+    
 	public enum Shape {
 		L,
 		I
 	};
 	
-	static List<Piece> pieces;
-	
-	static Dictionary<Shape,int> shapes = new Dictionary<Shape, int>()
+    static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
 	{
-		//base 2
-		{Shape.I, 10000011}
+
+		{Shape.I, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}}
 		
 		
 	};
 	
-	public static Piece Make(Shape shape){
-		
-		
-		Piece basePiece = new Piece();
-		
-		//converts the number from base 2 to base 10
-		int shapeNum = Convert.ToInt32(shapes[shape].ToString(), 2);
-		
-		
-		pieces = new List<Piece>();
-		
-		//addLinks(0, shapeNum);
-		
-		return basePiece;
+	public static Piece Make(Layout layout, Shape shape){
+
+        GameObject piecePrefab = (GameObject)Resources.Load("3DAssets/Piece");
+
+        GameObject newPiece = GameObject.Instantiate(piecePrefab);
+
+        Piece piece = newPiece.GetComponent<Piece>();
+        piece.layout = layout;
+        
+
+        int[,] points = shapes[shape];
+        for (int i = 0; i < points.Length / 2; i++)
+        {
+            Hex hex = OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, new OffsetCoord(points[i,0], points[i,1]));
+            piece.AddHex(hex); 
+        }
+
+        return piece;
 	
 	}
-	
-	static void addLinks(int position, int shapeNum){
-				
-		pieces[position] = new Piece();
-		
-		int[] adj = HexCalcs.adjacentPositions(position);
-		
-		for(int i = 0; i < adj.Length; i ++){
-		
-			if(pieces[adj[i]] == null)
-				addLinks(adj[i], shapeNum);
-			
-			pieces[position].links[HexCalcs.relativePosition(position, adj[i])] = pieces[adj[i]];
-		}
-		
-	}
-	
-	
+
+
 }
 
 

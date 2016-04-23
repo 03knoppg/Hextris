@@ -3,7 +3,9 @@ using UnityEngine;
 
 public static class HexCalcs
 {
-	
+
+
+
 	public static int[] adjacentPositions(int position)
 	{
 		
@@ -13,7 +15,7 @@ public static class HexCalcs
 		
 		int[] adj = new int[6];	
 		
-		int rank = getRank(position);
+		int rank = GetRank(position);
 		bool cornerPiece = (position - 1) % rank == 0;
 		
 		adj[0] = cwPosition(position);
@@ -43,17 +45,21 @@ public static class HexCalcs
 	}
 	
 	//bug here
-	//return position adjcent to position in same rank in couter clockwise direction
+	//return position adjcent to position in same rank in counter clockwise direction
 	public static int ccwPosition(int position)
 	{
 		if(position <= 0)
 			throw new ArgumentOutOfRangeException(position + " : position must be > 0");
 		
 		//could use some optimization
-		int rank = getRank (position);
+		int rank = GetRank (position);
 		
-		return ((position - 1 - totalPositionsByRank(rank - 1)) + (6 * rank) ) % (rank * 6) + totalPositionsByRank(rank - 1);
-	}
+        //???
+		//return ((position - 1 - totalPositionsByRank(rank - 1)) + (6 * rank) ) % (rank * 6) + totalPositionsByRank(rank - 1);
+
+        return rank == GetRank(position - 1) ? position - 1 : position + positionsInRank(rank) - 1;
+    
+    }
 	
 	
 	//return position adjcent to position in same rank in clockwise direction
@@ -63,12 +69,16 @@ public static class HexCalcs
 			throw new ArgumentOutOfRangeException(position + " : position must be > 0");
 		
 		//could use some optimization
-		int rank = getRank (position);
+		int rank = GetRank (position);
 		
-		return ((position + 1 - totalPositionsByRank(rank -1)) % (rank * 6) ) + totalPositionsByRank(rank -1);
-	}
+        //?
+		//return ((position + 1 - totalPositionsByRank(rank -1)) % (rank * 6) ) + totalPositionsByRank(rank -1);
+
+        return (position + 1) % positionsInRank(rank);
+    
+    }
 	
-	public static int getRank(int position)
+	public static int GetRank(int position)
 	{
 		return (int)Mathf.Ceil((Mathf.Sqrt((12 * (position + 1)) - 3) - 3) / 6);
 	}
@@ -76,7 +86,7 @@ public static class HexCalcs
 	public static int totalPositionsByRank(int rank)
 	{
 		if(rank < 1)
-			return 0;
+			return 1;
 		
 		return (3*rank*rank) + (3*rank) + 1;
 			
@@ -96,6 +106,42 @@ public static class HexCalcs
 		throw new NotImplementedException();
 		
 	}
+
+    static public Hex cube_to_hex(Vector2 h) // axial
+    {
+        int q = (int)h.x;
+        int r = (int)h.y;
+        return new Hex(q, -(q + r), r);
+    }
+
+    public static Vector3 hex_to_cube(Hex h)//: # axial
+    {
+        float x = h.q;
+        float z = h.r;
+        float y = -x - z;
+        return new Vector3(x, y, z);
+    }
+
+    public static Hex RotateHex(Hex hex, int direction)
+    {
+
+        Vector3 cube = HexCalcs.hex_to_cube(hex);
+        for (; direction > 0; direction--)
+        {
+            float temp = cube.x;
+            cube.x = -cube.z;
+            cube.z = -cube.y;
+            cube.y = -temp;
+        }
+        for (; direction < 0; direction++)
+        {
+            float temp = cube.x;
+            cube.x = -cube.y;
+            cube.y = -cube.z;
+            cube.z = -temp;
+        }
+        return HexCalcs.cube_to_hex(cube);
+    }
 }
 
 
