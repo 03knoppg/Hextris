@@ -1,0 +1,15 @@
+/Binaries
+/DerivedDataCache
+/Intermediate
+/Saved
+/Plugins
+/Temp
+/obj
+*.sdf
+*.opensdf
+*.sln
+*.suo
+/Build
+*.uproject
+*.VC.opendb
+*.mov
