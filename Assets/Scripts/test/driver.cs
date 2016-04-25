@@ -1,29 +1,30 @@
 using System;
 using UnityEngine;
 
-namespace AssemblyCSharp
+
+public class Driver : MonoBehaviour
 {
-	public class driver : MonoBehaviour
-    {
 
-        public float size = 5;
-        Piece IPiece;
+    public float size = 5;
+    Piece IPiece;
 
-		void Start(){
+    public static Layout layout;
 
-            Layout layout = new Layout(Layout.pointy, new Point(size, size), new Point(0, 0));
+	void Start(){
 
-            GameObject boardObject = new GameObject();
-            RectangleBoard board = boardObject.AddComponent<RectangleBoard>();
+        layout = new Layout(Layout.pointy, new Point(size, size), new Point(0, 0));
 
-            board.InitBoard(layout);
+        GameObject boardObject = new GameObject();
+        RectangleBoard board = boardObject.AddComponent<RectangleBoard>();
 
-            IPiece = PieceMaker.Make(layout, PieceMaker.Shape.I);	
-		}
+        board.InitBoard();
 
-
+        IPiece = PieceMaker.Make(PieceMaker.Shape.I);	
 	}
 
- 
+
 }
+
+ 
+
 

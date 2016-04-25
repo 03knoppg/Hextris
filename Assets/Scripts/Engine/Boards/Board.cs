@@ -13,7 +13,7 @@ public abstract class Board : MonoBehaviour{
     protected Hex[,] Hexes;
 	
 	
-    public abstract void InitBoard(Layout layout);
+    public abstract void InitBoard();
 	
 
 

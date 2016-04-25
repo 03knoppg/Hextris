@@ -5,28 +5,29 @@ using UnityEngine;
 
 public class PieceMaker
 {
+    static GameObject PiecePrefab;
+
     
 	public enum Shape {
-		L,
+		L, //not yet implemented
 		I
 	};
 	
     static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
 	{
-
+        //Axial coodrdinates
 		{Shape.I, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}}
 		
 		
 	};
 	
-	public static Piece Make(Layout layout, Shape shape){
+	public static Piece Make(Shape shape){
+        if(PiecePrefab == null)
+            PiecePrefab = (GameObject)Resources.Load("3DAssets/Piece");
 
-        GameObject piecePrefab = (GameObject)Resources.Load("3DAssets/Piece");
-
-        GameObject newPiece = GameObject.Instantiate(piecePrefab);
+        GameObject newPiece = GameObject.Instantiate(PiecePrefab);
 
         Piece piece = newPiece.GetComponent<Piece>();
-        piece.layout = layout;
         
 
         int[,] points = shapes[shape];
@@ -39,8 +40,6 @@ public class PieceMaker
         return piece;
 	
 	}
-
-
 }
 
 

@@ -1,8 +1,13 @@
 fileFormatVersion: 2
 guid: 785135accc1a10b45bbe79cc0389d379
+timeCreated: 1461619711
+licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - GameHexPrefab: {fileID: 178922, guid: 39fa96f69f5bf2e4eae56da3d427d6f6, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
+  assetBundleName: 
+  assetBundleVariant: 

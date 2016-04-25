@@ -5,6 +5,7 @@
 /Plugins
 /Temp
 /obj
+/Library
 *.sdf
 *.opensdf
 *.sln

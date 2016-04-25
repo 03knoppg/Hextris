@@ -77,7 +77,7 @@
     <Compile Include="Assets\Scripts\Engine\Pieces\Piece.cs" />
     <Compile Include="Assets\Scripts\Engine\Pieces\PieceMaker.cs" />
     <Compile Include="Assets\Scripts\Engine\Utils\HexCalcs.cs" />
-    <Compile Include="Assets\Scripts\test\driver.cs" />
+    <Compile Include="Assets\Scripts\test\Driver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

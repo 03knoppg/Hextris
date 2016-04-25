@@ -7,10 +7,13 @@ using UnityEngine;
 
 public class GameHex : MonoBehaviour
 {
+    //would like to set transform.position here but dont want to piece's local layout
     public Hex hex;
+
 
     public delegate void ClickAction(GameHex hex);
     public static event ClickAction OnClicked;
+
 
     void OnMouseUpAsButton()
     {
@@ -24,5 +27,9 @@ public class GameHex : MonoBehaviour
         hex = HexCalcs.RotateHex(hex, amount);
     }
 
+    public void SetColour(Color newColour)
+    {
+        GetComponent<Renderer>().material.SetColor("_Color", newColour);
+    }
 }
 
