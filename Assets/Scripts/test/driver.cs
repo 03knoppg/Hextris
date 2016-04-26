@@ -5,8 +5,9 @@ using UnityEngine;
 public class Driver : MonoBehaviour
 {
 
+    public Game ClassicGamePrefab;
+
     public float size = 5;
-    Piece IPiece;
 
     public static Layout layout;
 
@@ -14,12 +15,8 @@ public class Driver : MonoBehaviour
 
         layout = new Layout(Layout.pointy, new Point(size, size), new Point(0, 0));
 
-        GameObject boardObject = new GameObject();
-        RectangleBoard board = boardObject.AddComponent<RectangleBoard>();
-
-        board.InitBoard();
-
-        IPiece = PieceMaker.Make(PieceMaker.Shape.I);	
+        Game newGame = GameObject.Instantiate<Game>(ClassicGamePrefab);
+        newGame.StartGame();
 	}
 
 
