@@ -16,7 +16,10 @@ public class PieceMaker
     static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
 	{
         //Axial coodrdinates
-		{Shape.I, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}}
+		{Shape.I, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
+
+        //fix this
+		{Shape.L, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}}
 		
 		
 	};
