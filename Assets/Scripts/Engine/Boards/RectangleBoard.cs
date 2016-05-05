@@ -11,9 +11,9 @@ public class RectangleBoard : Board
     {
         name = "RectangleBoard";
 
-		GameObject hexObjPrefab = (GameObject) Resources.Load("3DAssets/HexObject");
+		
 
-        GameObject newHex;
+        GameHex newHex;
         Hexes = new Hex[columns, rows];
 
 		for(int col = 0; col < columns; col ++){
@@ -25,19 +25,16 @@ public class RectangleBoard : Board
 
                 Hexes[coord.col, coord.row] = hex;
 
-                newHex = (GameObject)Instantiate(hexObjPrefab);
+                newHex = Instantiate<GameHex>(GameHexPrefab);
                 newHex.transform.parent = transform;
-                newHex.name = "Hex " + coord.col + " " + coord.row;
-                newHex.GetComponent<GameHex>().SetColour(Color.red);
+                
+                newHex.SetColour(Color.red);
 
-                Point p = Layout.HexToPixel(Driver.layout, hex);
-                newHex.transform.position = new Vector3(p.x, 0, p.y);
+                newHex.SetPosition(Driver.layout, hex);
  
 			}
 		}
 	}
-		
-
 }
 
 

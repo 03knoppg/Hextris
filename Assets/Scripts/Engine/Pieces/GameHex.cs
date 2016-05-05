@@ -7,13 +7,31 @@ using UnityEngine;
 
 public class GameHex : MonoBehaviour
 {
-    //would like to set transform.position here but dont want to piece's local layout
-    public Hex hex;
+    Hex hex;
 
 
     public delegate void ClickAction(GameHex hex);
-    public static event ClickAction OnClicked;
+    public event ClickAction OnClicked;
 
+    public bool IsPivotHex
+    {
+        get
+        {
+            return Hex.Length(hex) == 0;
+        }
+    }
+    public Point LocalPoint
+    {
+        get
+        {
+            return new Point(transform.localPosition.x, transform.localPosition.z);
+        }
+    }
+
+    void Awake()
+    {
+        hex = new Hex();
+    }
 
     void OnMouseUpAsButton()
     {
@@ -30,6 +48,32 @@ public class GameHex : MonoBehaviour
     public void SetColour(Color newColour)
     {
         GetComponent<Renderer>().material.SetColor("_Color", newColour);
+    }
+
+    public void UpdateLayout(Layout oldLayout, Layout newLayout)
+    {
+        //old pivot hex
+        if (IsPivotHex)
+            SetColour(Color.blue);
+
+        //translate into new layout based on new pivot hex
+        hex = FractionalHex.HexRound(Layout.PixelToHex(newLayout, Layout.HexToPixel(oldLayout, hex)));
+        UpdatePosition(newLayout);
+    }
+
+    public void UpdatePosition(Layout localLayout)
+    {
+        Point position = Layout.HexToPixel(localLayout, hex);
+        transform.localPosition = new Vector3(position.x, 0, position.y);
+
+        OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
+        name = "Hex{" + coord.col + ", " + coord.row + "}";
+    }
+
+    public void SetPosition(Layout layout, Hex hex)
+    {
+        this.hex = hex;
+        UpdatePosition(layout);
     }
 }
 

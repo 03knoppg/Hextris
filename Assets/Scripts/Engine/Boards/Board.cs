@@ -6,7 +6,7 @@ using System.Collections;
 
 public abstract class Board : MonoBehaviour{
 
-
+    public GameHex GameHexPrefab;
     protected Hex[,] Hexes;
 
     void Start()
@@ -15,7 +15,4 @@ public abstract class Board : MonoBehaviour{
     }
     public abstract void InitBoard();
 	
-
-
-
 }

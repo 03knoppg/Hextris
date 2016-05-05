@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class PieceMaker
+public class PieceMaker : MonoBehaviour
 {
-    static GameObject PiecePrefab;
+    public Piece PiecePrefab;
 
     
 	public enum Shape {
@@ -24,14 +24,10 @@ public class PieceMaker
 		
 	};
 	
-	public static Piece Make(Shape shape){
-        if(PiecePrefab == null)
-            PiecePrefab = (GameObject)Resources.Load("3DAssets/Piece");
+	public Piece Make(Shape shape){
 
-        GameObject newPiece = GameObject.Instantiate(PiecePrefab);
-
-        Piece piece = newPiece.GetComponent<Piece>();
-        
+        Piece piece = Instantiate<Piece>(PiecePrefab);
+                
 
         int[,] points = shapes[shape];
         for (int i = 0; i < points.Length / 2; i++)

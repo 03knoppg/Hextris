@@ -8,14 +8,10 @@ using UnityEngine;
  */
 public class Piece: MonoBehaviour
 {
-    //public delegate void Placed();
-    //public Placed OnPlaced;
-
     public List<GameHex> hexes = new List<GameHex>();
-    public GameObject GameHexPrefab;
+    public GameHex GameHexPrefab;
 
-
-
+    public Mode mode;
     public enum Mode
     {
         Placement,
@@ -26,37 +22,24 @@ public class Piece: MonoBehaviour
     //the position of each hex is based on the local layout where the mainHex is always at (0,0)
     Layout localLayout;
 
-    public Mode mode;
-    bool turning = false;
 
-    public Piece()
+    void Awake()
     {
         localLayout = new Layout(Driver.layout.orientation, Driver.layout.size, new Point(0, 0));
     }
 
-    void Start()
-    {
-        GameHex.OnClicked += OnHexClicked;
-
-    }
 
     public void AddHex(Hex hex)
     {
-        //GameObject GameHexPrefab = (GameObject)Resources.Load("3DAssets/HexObjectBlue");
-        GameObject newHexObject = GameObject.Instantiate<GameObject>(GameHexPrefab);
-        
-        newHexObject.transform.parent = transform;
-        newHexObject.name += UnityEngine.Random.value;
+        GameHex newGameHex = Instantiate<GameHex>(GameHexPrefab);
 
-        GameHex newGameHex = newHexObject.GetComponent<GameHex>();
-        newGameHex.hex = hex;
+        newGameHex.transform.parent = transform;
+        newGameHex.OnClicked += OnHexClicked;
+        newGameHex.SetPosition(localLayout, hex);
+
         hexes.Add(newGameHex);
         if (hexes.Count == 1)
             SetPivotHex(newGameHex);
-
-        Point position = Layout.HexToPixel(localLayout, hex);
-        newHexObject.transform.position = new Vector3(position.x, 0.2f, position.y);
-
     }
 
 
@@ -65,36 +48,27 @@ public class Piece: MonoBehaviour
     {
         if (mode == Mode.Active)
         {
-            turning = true;
-            if (Hex.Length(gameHex.hex) > 0)
-                SetPivotHex(gameHex);
-            else
+            if (gameHex.IsPivotHex)
                 Rotate();
+            else
+                SetPivotHex(gameHex);
         }
     }
 
-    private void SetPivotHex(GameHex gameHex)
+    private void SetPivotHex(GameHex pivotHex)
     {
+        Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
 
-        Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, Layout.HexToPixel(localLayout, gameHex.hex));
-
-        foreach(GameHex ghex in hexes)
+        foreach(GameHex gameHex in hexes)
         {
-            //old pivot hex
-            if(Hex.Length(ghex.hex) == 0)
-                ghex.SetColour(Color.blue);
-
-            //translate into new layout based on new pivot hex
-            ghex.hex = FractionalHex.HexRound(Layout.PixelToHex(newLocalLayout, Layout.HexToPixel(localLayout, ghex.hex)));
-            Point point = Layout.HexToPixel(newLocalLayout, ghex.hex);
-            ghex.transform.position = new Vector3(point.x, 0.2f, point.y);
+            gameHex.UpdateLayout(localLayout, newLocalLayout);
         }
 
-        gameHex.SetColour(Color.green);
+        pivotHex.SetColour(Color.green);
         localLayout = newLocalLayout;
     }
 
-    //SImply set the transform position
+    //Simply set the transform position
     public void SetPosition(Point position)
     {
         transform.position = new Vector3(position.x, 0.2f, position.y);
@@ -105,8 +79,7 @@ public class Piece: MonoBehaviour
         foreach (GameHex gameHex in hexes)
         {
             gameHex.Rotate(1);
-            Point position = Layout.HexToPixel(localLayout, gameHex.hex);
-            gameHex.transform.position = new Vector3(position.x, 0.2f, position.y);
+            gameHex.UpdatePosition(localLayout);
         }
     }
 
@@ -120,7 +93,7 @@ public class Piece: MonoBehaviour
             foreach (GameHex ghex in hexes)
             {
                 //old pivot hex
-                if (Hex.Length(ghex.hex) == 0)
+                if (ghex.IsPivotHex)
                     ghex.SetColour(Color.green);
                 else
                     ghex.SetColour(Color.blue);

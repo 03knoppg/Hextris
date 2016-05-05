@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 public class Game : MonoBehaviour {
 
+    public PieceMaker PieceMakerPrefab;
+
     public enum GameType
     {
         Classic
@@ -43,10 +45,10 @@ public class Game : MonoBehaviour {
 
     public void StartGame()
     {
-        UISignals = GameObject.FindObjectOfType<UISignals>();
+        UISignals = FindObjectOfType<UISignals>();
         UISignals.OnEndTurn += NextPlayer;
 
-        currentBoard = GameObject.Instantiate<Board>(BoardPrefab);
+        currentBoard = Instantiate<Board>(BoardPrefab);
 
         players = new List<Player>();
         for (int i = 0; i < numPlayers; i++)
@@ -79,7 +81,7 @@ public class Game : MonoBehaviour {
             Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
             float rayDistance;
             bool hit = boardPlane.Raycast(ray, out rayDistance);
-            //Debug.logger.Log(rayDistance + " " + hit);
+
             if (hit)
             {
                 Vector3 point = ray.GetPoint(rayDistance);
@@ -100,7 +102,7 @@ public class Game : MonoBehaviour {
             return;
         }
             
-        Piece piece = PieceMaker.Make(shapes[Mathf.FloorToInt(currentPlacementPieceIndex / 2)]);
+        Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(currentPlacementPieceIndex / 2)]);
         piece.mode = Piece.Mode.Placement;
 
         //for two players go 01100110 etc.

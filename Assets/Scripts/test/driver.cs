@@ -15,7 +15,7 @@ public class Driver : MonoBehaviour
 
         layout = new Layout(Layout.pointy, new Point(size, size), new Point(0, 0));
 
-        Game newGame = GameObject.Instantiate<Game>(ClassicGamePrefab);
+        Game newGame = Instantiate<Game>(ClassicGamePrefab);
         newGame.StartGame();
 	}
 
