@@ -18,6 +18,7 @@ public struct Point
     public readonly float y;
 }
 
+[Serializable]
 public struct Hex
 {
     public Hex(int q, int r, int s)
@@ -26,9 +27,10 @@ public struct Hex
         this.r = r;
         this.s = s;
     }
-    public readonly int q;
-    public readonly int r;
-    public readonly int s;
+    [SerializeField]
+    public int q;
+    public int r;
+    public int s;
 
     static public Hex Add(Hex a, Hex b)
     {
@@ -79,6 +81,25 @@ public struct Hex
         return Hex.Length(Hex.Subtract(a, b));
     }
 
+#region operator overrides
+    public override bool Equals(System.Object obj)
+    {
+        return base.Equals(obj);
+    }
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+    public static bool operator ==(Hex a, Hex b)
+    {
+        return a.q == b.q && a.r == b.r && a.s == b.s;
+    }
+
+    public static bool operator !=(Hex a, Hex b)
+    {
+        return !(a == b);
+    }
+#endregion
 }
 
 public struct FractionalHex

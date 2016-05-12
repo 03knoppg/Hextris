@@ -11,6 +11,9 @@ public class Piece: MonoBehaviour
     public List<GameHex> hexes = new List<GameHex>();
     public GameHex GameHexPrefab;
 
+    public List<Hex> legalStartingHexes;
+    public Layout GlobalLayout;
+
     public Mode mode;
     public enum Mode
     {
@@ -42,8 +45,6 @@ public class Piece: MonoBehaviour
             SetPivotHex(newGameHex);
     }
 
-
-
     private void OnHexClicked(GameHex gameHex)
     {
         if (mode == Mode.Active)
@@ -72,6 +73,14 @@ public class Piece: MonoBehaviour
     public void SetPosition(Point position)
     {
         transform.position = new Vector3(position.x, 0.2f, position.y);
+
+        if (!IsValidPosition())
+        {
+            foreach (GameHex gHex in hexes)
+            {
+                gHex.SetColour(Color.red);
+            }
+        }
     }
 
     void Rotate()
@@ -107,6 +116,22 @@ public class Piece: MonoBehaviour
                 ghex.SetColour(Color.grey);
             }
         }
+    }
+
+    public bool IsValidPosition()
+    {
+        if (mode == Mode.Placement)
+        {
+            foreach (GameHex gHex in hexes)
+            {
+                foreach (Hex hex in legalStartingHexes)
+                {
+                    if(gHex.Equals(FractionalHex.HexRound(Layout.PixelToHex(localLayout, Layout.HexToPixel(GlobalLayout, hex)))))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 }
 

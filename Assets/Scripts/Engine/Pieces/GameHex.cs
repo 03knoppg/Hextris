@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class GameHex : MonoBehaviour
 {
+    [SerializeField]
     Hex hex;
 
 
@@ -74,6 +75,11 @@ public class GameHex : MonoBehaviour
     {
         this.hex = hex;
         UpdatePosition(layout);
+    }
+
+    public bool Equals(Hex otherHex)
+    {
+        return otherHex == hex;
     }
 }
 

@@ -4,14 +4,19 @@ using System.Collections.Generic;
 
 public class Game : MonoBehaviour {
 
+    public delegate void GamePhaseChange(GamePhase newPhase);
+    public GamePhaseChange OnGamePhaseChange;
+
     public PieceMaker PieceMakerPrefab;
+
+    public List<Hex> legalStartingHexes;
 
     public enum GameType
     {
         Classic
     }
 
-    enum GamePhase
+    public enum GamePhase
     {
         Setup,
         Main
@@ -59,8 +64,15 @@ public class Game : MonoBehaviour {
         }
 
         currentPlacementPieceIndex = 0;
-        currentPhase = GamePhase.Setup;
+        SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
+    }
+
+    void SetPhase(GamePhase newPhase)
+    {
+        currentPhase = newPhase;
+        if (OnGamePhaseChange != null)
+            OnGamePhaseChange(currentPhase);
     }
 
     void PiecePlaced()
@@ -88,6 +100,7 @@ public class Game : MonoBehaviour {
                 FractionalHex fHex = Layout.PixelToHex(Driver.layout, new Point(point.x, point.z));
                 Point p = Layout.HexToPixel(Driver.layout, FractionalHex.HexRound(fHex));
                 currentPlacementPiece.SetPosition(p);
+
             }
             
         }
@@ -104,6 +117,8 @@ public class Game : MonoBehaviour {
             
         Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(currentPlacementPieceIndex / 2)]);
         piece.mode = Piece.Mode.Placement;
+        piece.GlobalLayout = Driver.layout;
+        piece.legalStartingHexes = legalStartingHexes;
 
         //for two players go 01100110 etc.
         players[Mathf.FloorToInt((currentPlacementPieceIndex + 1) /2) % 2].pieces.Add(piece);
