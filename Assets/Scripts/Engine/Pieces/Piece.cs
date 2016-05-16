@@ -87,10 +87,7 @@ public class Piece: MonoBehaviour
     {
         if (mode == EMode.Selected)
         {
-            if (rotationRate > 0)
-                rotation--;
-            else
-                rotation++;
+            rotation = 0;
         }
     }
 
@@ -129,7 +126,7 @@ public class Piece: MonoBehaviour
 
     private void OnHexClicked(GameHex gameHex)
     {
-        if (mode != EMode.Inactive)
+        if (rotationRate == 0 && mode != EMode.Inactive)
         {
             if (OnPieceClicked != null)
                 OnPieceClicked(this, gameHex);
@@ -150,10 +147,15 @@ public class Piece: MonoBehaviour
         pivotHex.SetColour(Color.green);
     }
 
-    public void Rotate()
+    public void RotateCCW()
     {
-        if(rotationRate == 0)
+        if (rotationRate == 0)
             rotation = -1;
+    }
+    public void RotateCW()
+    {
+        if (rotationRate == 0)
+            rotation = 1;
     }
 
     internal void SetColor(Color color)

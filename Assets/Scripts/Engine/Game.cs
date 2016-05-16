@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 public class Game : MonoBehaviour {
 
@@ -43,14 +44,15 @@ public class Game : MonoBehaviour {
     int numPlayers = 1;
     List<PieceMaker.Shape> shapes = new List<PieceMaker.Shape>()
     {
-        //PieceMaker.Shape.I,
+        PieceMaker.Shape.I,
         PieceMaker.Shape.L
     };
 
     public void StartGame()
     {
         UISignals = FindObjectOfType<UISignals>();
-        UISignals.OnEndTurn += NextPlayer;
+
+        UISignals.AddListeners(UIClick, new List<UISignals.UISignal>() { UISignals.UISignal.RotateCCW, UISignals.UISignal.RotateCW, UISignals.UISignal.EndTurn });
 
         currentBoard = Instantiate<Board>(BoardPrefab);
 
@@ -65,6 +67,22 @@ public class Game : MonoBehaviour {
         currentPlacementPieceIndex = 0;
         SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
+    }
+
+    public void UIClick(UISignals.UISignal signal)
+    {
+        switch (signal)
+        {
+            case UISignals.UISignal.EndTurn:
+                NextPlayer();
+                break;
+            case UISignals.UISignal.RotateCCW:
+                currentSelectedPiece.RotateCCW();
+                break;
+            case UISignals.UISignal.RotateCW:
+                currentSelectedPiece.RotateCW();
+                break;
+        }
     }
 
     void SetPhase(GamePhase newPhase)
@@ -135,14 +153,13 @@ public class Game : MonoBehaviour {
     {
         if (currentPhase == GamePhase.Setup)
         {
-            PiecePlaced(piece);
+            if (piece == currentSelectedPiece && IsValidPosition(piece))
+                PiecePlaced(piece);
         }
         if (currentPhase == GamePhase.Main)
         {
-            if (piece == currentSelectedPiece && hex.IsPivotHex)
-                piece.Rotate();
 
-            else if (!hex.IsPivotHex)
+            if (!hex.IsPivotHex)
                 piece.SetPivotHex(hex);
             
 

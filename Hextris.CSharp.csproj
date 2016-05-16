@@ -73,6 +73,7 @@
     <Compile Include="Assets\Scripts\Engine\Pieces\PieceMaker.cs" />
     <Compile Include="Assets\Scripts\Engine\Player.cs" />
     <Compile Include="Assets\Scripts\Engine\Utils\HexCalcs.cs" />
+    <Compile Include="Assets\Scripts\UI\UIButton.cs" />
     <Compile Include="Assets\Scripts\UI\UISignals.cs" />
     <Compile Include="Assets\Scripts\test\Driver.cs" />
   </ItemGroup>
