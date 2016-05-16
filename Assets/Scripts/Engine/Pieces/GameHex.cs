@@ -7,11 +7,15 @@ using UnityEngine;
 
 public class GameHex : MonoBehaviour
 {
+    [SerializeField]
     Hex hex;
 
 
     public delegate void ClickAction(GameHex hex);
     public event ClickAction OnClicked;
+
+    public delegate void Collision();
+    public event Collision OnCollision;
 
     public bool IsPivotHex
     {
@@ -74,6 +78,17 @@ public class GameHex : MonoBehaviour
     {
         this.hex = hex;
         UpdatePosition(layout);
+    }
+
+    public bool Equals(Hex otherHex)
+    {
+        return otherHex == hex;
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (OnCollision != null)
+            OnCollision();
     }
 }
 

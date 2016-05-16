@@ -4,14 +4,18 @@ using System.Collections.Generic;
 
 public class Game : MonoBehaviour {
 
+    public delegate void GamePhaseChange(GamePhase newPhase);
+    public GamePhaseChange OnGamePhaseChange;
+
     public PieceMaker PieceMakerPrefab;
+    
 
     public enum GameType
     {
         Classic
     }
 
-    enum GamePhase
+    public enum GamePhase
     {
         Setup,
         Main
@@ -24,7 +28,7 @@ public class Game : MonoBehaviour {
     GamePhase currentPhase;
     Piece currentPlacementPiece;
     int currentPlacementPieceIndex;
-
+    int currentPlayerNum;
 
     [SerializeField]
     GameType type;
@@ -36,10 +40,10 @@ public class Game : MonoBehaviour {
     UISignals UISignals;
 
     //move these to gameType structure
-    int numPlayers = 2;
+    int numPlayers = 1;
     List<PieceMaker.Shape> shapes = new List<PieceMaker.Shape>()
     {
-        PieceMaker.Shape.I,
+        //PieceMaker.Shape.I,
         PieceMaker.Shape.L
     };
 
@@ -59,13 +63,20 @@ public class Game : MonoBehaviour {
         }
 
         currentPlacementPieceIndex = 0;
-        currentPhase = GamePhase.Setup;
+        SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
     }
 
-    void PiecePlaced()
+    void SetPhase(GamePhase newPhase)
     {
-        currentPlacementPiece.mode = Piece.Mode.Inactive;
+        currentPhase = newPhase;
+        if (OnGamePhaseChange != null)
+            OnGamePhaseChange(currentPhase);
+    }
+
+    void PiecePlaced(Piece piece)
+    {
+        piece.mode = Piece.Mode.Inactive;
         MakeNextPlacementPiece();
     }
 
@@ -73,10 +84,6 @@ public class Game : MonoBehaviour {
     {
         if (currentPhase == GamePhase.Setup)
         {
-            if (Input.GetMouseButtonUp(0))
-            {
-                PiecePlaced();
-            }
             Plane boardPlane = new Plane(Vector3.up, currentBoard.transform.position);
             Ray ray = UnityEngine.Camera.main.ScreenPointToRay(Input.mousePosition);
             float rayDistance;
@@ -87,7 +94,12 @@ public class Game : MonoBehaviour {
                 Vector3 point = ray.GetPoint(rayDistance);
                 FractionalHex fHex = Layout.PixelToHex(Driver.layout, new Point(point.x, point.z));
                 Point p = Layout.HexToPixel(Driver.layout, FractionalHex.HexRound(fHex));
-                currentPlacementPiece.SetPosition(p);
+                currentPlacementPiece.Point = p;
+                if (IsValidPosition(currentPlacementPiece))
+                    currentPlacementPiece.SetColor(Color.green);
+                else
+                    currentPlacementPiece.SetColor(Color.red);
+
             }
             
         }
@@ -95,22 +107,48 @@ public class Game : MonoBehaviour {
 
     void MakeNextPlacementPiece()
     {
-        if (Mathf.FloorToInt(currentPlacementPieceIndex / 2) == shapes.Count)
+        //have all the pieces been placed?
+        if (Mathf.FloorToInt(currentPlacementPieceIndex / numPlayers) == shapes.Count)
         {
             currentPhase = GamePhase.Main;
             NextPlayer();
             return;
         }
-            
-        Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(currentPlacementPieceIndex / 2)]);
-        piece.mode = Piece.Mode.Placement;
 
         //for two players go 01100110 etc.
-        players[Mathf.FloorToInt((currentPlacementPieceIndex + 1) /2) % 2].pieces.Add(piece);
+        int p = numPlayers - 1;
+        currentPlayerNum = Mathf.Clamp(Mathf.FloorToInt(currentPlacementPieceIndex / (p + 1)) % 2 == 0 ?
+            currentPlacementPieceIndex % (p + 1) :
+            p - currentPlacementPieceIndex % (p + 1), 0, p);
+        
+        Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(currentPlacementPieceIndex / 2)]);
+        piece.mode = Piece.Mode.Placement;
+        piece.OnPieceClicked += OnPieceClicked;
 
+        players[currentPlayerNum].pieces.Add(piece);
 
         currentPlacementPiece = piece;
         currentPlacementPieceIndex++;
+    }
+
+    private void OnPieceClicked(Piece piece, GameHex hex)
+    {
+        if (currentPhase == GamePhase.Setup)
+        {
+            PiecePlaced(piece);
+        }
+        if (currentPhase == GamePhase.Main)
+        {
+            if (piece.mode != Piece.Mode.Selected || !hex.IsPivotHex)
+            {
+                piece.mode = Piece.Mode.Selected;
+                piece.SetPivotHex(hex);
+            }
+            else
+            {
+                piece.Rotate();
+            }
+        }
     }
 
     void NextPlayer()
@@ -121,5 +159,29 @@ public class Game : MonoBehaviour {
         {
             players[i].SetActivePlayer(currentPlayerIndex == i);
         }
+    }
+
+    public bool IsValidPosition(Piece piece)
+    {
+        if (currentPhase == GamePhase.Setup)
+        {
+            bool touchingStartArea = false;
+            foreach (GameHex gHex in piece.hexes)
+            {
+                Point local2GlobalPoint = gHex.LocalPoint + piece.Point;
+                Hex hex = FractionalHex.HexRound(Layout.PixelToHex(Driver.layout, local2GlobalPoint));
+
+                foreach (Hex legalHex in currentPlayerNum == 0 ? currentBoard.legalStartingHexesP1 : currentBoard.legalStartingHexesP2)
+                {
+                    if (hex.Equals(legalHex))
+                        touchingStartArea = true;
+                    if (!currentBoard.InBounds(hex))
+                        return false;
+                }
+            }
+            return touchingStartArea;
+
+        }
+        return false;
     }
 }

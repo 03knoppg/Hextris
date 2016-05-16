@@ -7,7 +7,7 @@ public class Driver : MonoBehaviour
 
     public Game ClassicGamePrefab;
 
-    public float size = 5;
+    public float size = 0.6f;
 
     public static Layout layout;
 

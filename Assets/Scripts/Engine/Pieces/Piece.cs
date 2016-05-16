@@ -8,26 +8,58 @@ using UnityEngine;
  */
 public class Piece: MonoBehaviour
 {
+    public delegate void PieceClicked(Piece piece, GameHex hex);
+    public PieceClicked OnPieceClicked;
+
     public List<GameHex> hexes = new List<GameHex>();
     public GameHex GameHexPrefab;
+    int rotation = 0;
+    float rotationRate = 0;
+
 
     public Mode mode;
     public enum Mode
     {
         Placement,
+        Selected,
         Active,
         Inactive
     }
 
     //the position of each hex is based on the local layout where the mainHex is always at (0,0)
-    Layout localLayout;
+    public Layout localLayout;
 
+    public Point Point
+    {
+        get { return new Point(transform.position.x, transform.position.z); }
+        set { transform.localPosition = new Vector3(value.x, 0.2f, value.y); }
+    }
 
     void Awake()
     {
         localLayout = new Layout(Driver.layout.orientation, Driver.layout.size, new Point(0, 0));
     }
 
+    void Start()
+    {
+        foreach (GameHex gHex in hexes)
+        {
+            gHex.OnCollision += HexCollision;
+        }
+    }
+
+    private void HexCollision()
+    {
+        if (transform.rotation.eulerAngles.y > rotation * 60)
+            rotation--; 
+        else
+            rotation++;
+    }
+
+    void Update()
+    {
+        transform.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, rotation * 60, ref rotationRate, 0.5f), 0);
+    }
 
     public void AddHex(Hex hex)
     {
@@ -42,21 +74,18 @@ public class Piece: MonoBehaviour
             SetPivotHex(newGameHex);
     }
 
-
-
     private void OnHexClicked(GameHex gameHex)
     {
-        if (mode == Mode.Active)
+        if (mode != Mode.Inactive)
         {
-            if (gameHex.IsPivotHex)
-                Rotate();
-            else
-                SetPivotHex(gameHex);
+            if (OnPieceClicked != null)
+                OnPieceClicked(this, gameHex);
         }
     }
 
-    private void SetPivotHex(GameHex pivotHex)
+    public void SetPivotHex(GameHex pivotHex)
     {
+
         Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
 
         foreach(GameHex gameHex in hexes)
@@ -68,19 +97,9 @@ public class Piece: MonoBehaviour
         localLayout = newLocalLayout;
     }
 
-    //Simply set the transform position
-    public void SetPosition(Point position)
+    public void Rotate()
     {
-        transform.position = new Vector3(position.x, 0.2f, position.y);
-    }
-
-    void Rotate()
-    {
-        foreach (GameHex gameHex in hexes)
-        {
-            gameHex.Rotate(1);
-            gameHex.UpdatePosition(localLayout);
-        }
+        rotation = (rotation + 1) % 6;
     }
 
 
@@ -108,6 +127,18 @@ public class Piece: MonoBehaviour
             }
         }
     }
+
+
+
+    internal void SetColor(Color color)
+    {
+        foreach (GameHex gHex in hexes)
+        {
+            gHex.SetColour(color);
+        }
+    }
+
+
 }
 
 
