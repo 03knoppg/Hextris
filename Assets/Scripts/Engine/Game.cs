@@ -11,6 +11,8 @@ public class Game : MonoBehaviour {
     public PieceMaker PieceMakerPrefab;
     
 
+    public List<Hex> legalStartingHexes;
+
     public enum GameType
     {
         Classic
@@ -115,6 +117,7 @@ public class Game : MonoBehaviour {
                 Vector3 point = ray.GetPoint(rayDistance);
                 FractionalHex fHex = Layout.PixelToHex(Driver.layout, new Point(point.x, point.z));
                 Point p = Layout.HexToPixel(Driver.layout, FractionalHex.HexRound(fHex));
+
                 currentSelectedPiece.Point = p;
                 if (IsValidPosition(currentSelectedPiece))
                     currentSelectedPiece.SetColor(Color.green);

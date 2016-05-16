@@ -176,10 +176,6 @@ public class Piece: MonoBehaviour
             gHex.SetColour(color);
         }
     }
-
-
-
-
 }
 
 

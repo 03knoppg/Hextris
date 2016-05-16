@@ -24,7 +24,7 @@ public class UIStates : MonoBehaviour {
     Dictionary<Group, UIStateChange> GroupStateChanges = new Dictionary<Group, UIStateChange>();
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
         foreach (Group group in Enum.GetValues(typeof(Group)))
         {
             GroupStateChanges[group] = new UIStateChange();
