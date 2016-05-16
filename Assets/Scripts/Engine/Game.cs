@@ -39,17 +39,19 @@ public class Game : MonoBehaviour {
 
     [SerializeField]
     UISignals UISignals;
+    UIStates UIState;
 
     //move these to gameType structure
     int numPlayers = 1;
     List<PieceMaker.Shape> shapes = new List<PieceMaker.Shape>()
     {
-        PieceMaker.Shape.I,
+        //PieceMaker.Shape.I,
         PieceMaker.Shape.L
     };
 
     public void StartGame()
     {
+        UIState = FindObjectOfType<UIStates>();
         UISignals = FindObjectOfType<UISignals>();
 
         UISignals.AddListeners(UIClick, new List<UISignals.UISignal>() { UISignals.UISignal.RotateCCW, UISignals.UISignal.RotateCW, UISignals.UISignal.EndTurn });
@@ -83,6 +85,7 @@ public class Game : MonoBehaviour {
                 currentSelectedPiece.RotateCW();
                 break;
         }
+
     }
 
     void SetPhase(GamePhase newPhase)
@@ -119,7 +122,37 @@ public class Game : MonoBehaviour {
                     currentSelectedPiece.SetColor(Color.red);
 
             }
-            
+        }
+
+        UpdateUIState();
+    }
+
+    void UpdateUIState()
+    {
+        if (currentPhase == GamePhase.Setup)
+        {
+            UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Hidden);
+        }
+        else if (currentPhase == GamePhase.Main)
+        {
+            bool anyTurning = false;
+            bool allLegal = true;
+            foreach (Piece piece in players[currentPlayerIndex].pieces)
+            {
+                anyTurning |= piece.rotationRate != 0;
+                allLegal &= IsValidPosition(piece);
+            }
+
+            if (anyTurning || currentSelectedPiece == null)
+                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
+            else
+                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
+
+
+            if (allLegal && !anyTurning)
+                UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Active);
+            else
+                UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Disabled);
         }
     }
 
@@ -166,7 +199,10 @@ public class Game : MonoBehaviour {
             if (piece != currentSelectedPiece && piece.Mode == Piece.EMode.Active)
             {
                 if (currentSelectedPiece != null)
+                {
                     currentSelectedPiece.Mode = Piece.EMode.Active;
+                    currentSelectedPiece.ResetRotation();
+                }
 
                 piece.Mode = Piece.EMode.Selected;
                 currentSelectedPiece = piece;
@@ -177,6 +213,7 @@ public class Game : MonoBehaviour {
     void NextPlayer()
     {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
+        currentSelectedPiece.LockRotation();
         currentSelectedPiece = null;
 
         for (int i = 0; i < players.Count; i++)
@@ -196,17 +233,29 @@ public class Game : MonoBehaviour {
             {
                 Point local2GlobalPoint = gHex.LocalPoint + piece.Point;
                 Hex hex = FractionalHex.HexRound(Layout.PixelToHex(Driver.layout, local2GlobalPoint));
+                if (!currentBoard.InBounds(hex))
+                    return false;
 
                 foreach (Hex legalHex in currentPlayerNum == 0 ? currentBoard.legalStartingHexesP1 : currentBoard.legalStartingHexesP2)
                 {
                     if (hex.Equals(legalHex))
                         touchingStartArea = true;
-                    if (!currentBoard.InBounds(hex))
-                        return false;
                 }
             }
             return touchingStartArea;
 
+        }
+        else if (currentPhase == GamePhase.Main)
+        {
+            foreach (GameHex gHex in piece.hexes)
+            {
+                Hex hex = FractionalHex.HexRound(Layout.PixelToHex(Driver.layout,  gHex.GlobalPoint));
+
+                if (!currentBoard.InBounds(hex))
+                    return false;
+                
+            }
+            return true;
         }
         return false;
     }

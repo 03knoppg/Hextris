@@ -95,20 +95,31 @@ public class Piece: MonoBehaviour
     {
         //Debug.Log(rotation * 60 + " " + transform.rotation.eulerAngles.y + " " + Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)));
         //rotate gameObject and detect collisions until near destination then snap to new position
-        if(Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)) > 0.01f)
-            transform.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, rotation * 60, ref rotationRate, 0.5f), 0);
+        if(Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)) > 0.05f)
+            transform.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, rotation * 60, ref rotationRate, 0.3f), 0);
 
         else if (Mathf.Abs(rotationRate) > 0)
         {
-            foreach (GameHex gHex in hexes)
-            {
-                gHex.Rotate(rotation);
-                gHex.UpdatePosition(localLayout);
-            }
             rotationRate = 0;
-            rotation = 0;
-            transform.rotation = Quaternion.identity;
         }
+    
+    }
+
+    public void LockRotation()
+    {
+        foreach (GameHex gHex in hexes)
+        {
+            gHex.Rotate(rotation);
+            gHex.UpdatePosition(localLayout);
+        }
+        rotationRate = 0;
+        rotation = 0;
+        transform.rotation = Quaternion.identity;
+    }
+
+    public void ResetRotation()
+    {
+        rotation = 0;
     }
 
     public void AddHex(Hex hex)
@@ -150,12 +161,12 @@ public class Piece: MonoBehaviour
     public void RotateCCW()
     {
         if (rotationRate == 0)
-            rotation = -1;
+            rotation = (rotation + 5) % 6;
     }
     public void RotateCW()
     {
         if (rotationRate == 0)
-            rotation = 1;
+            rotation = (rotation + 1) % 6;
     }
 
     internal void SetColor(Color color)

@@ -75,6 +75,7 @@
     <Compile Include="Assets\Scripts\Engine\Utils\HexCalcs.cs" />
     <Compile Include="Assets\Scripts\UI\UIButton.cs" />
     <Compile Include="Assets\Scripts\UI\UISignals.cs" />
+    <Compile Include="Assets\Scripts\UI\UIStates.cs" />
     <Compile Include="Assets\Scripts\test\Driver.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />

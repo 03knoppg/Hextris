@@ -14,7 +14,6 @@ public class UISignals : MonoBehaviour
     };
 
     public class UIButtonClick : UnityEvent<UISignal> { };
-
     Dictionary<UISignal, UIButtonClick> buttonActions = new Dictionary<UISignal, UIButtonClick>();
 
     void Start()

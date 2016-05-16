@@ -31,6 +31,13 @@ public class GameHex : MonoBehaviour
             return new Point(transform.localPosition.x, transform.localPosition.z);
         }
     }
+    public Point GlobalPoint
+    {
+        get
+        {
+            return new Point(transform.position.x, transform.position.z);
+        }
+    }
 
     void Awake()
     {
