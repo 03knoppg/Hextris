@@ -21,7 +21,7 @@ public class Player {
     {
         foreach (Piece p in pieces)
         {
-            p.SetActive(active);
+            p.Mode = Piece.EMode.Active;
         }
     }
 }

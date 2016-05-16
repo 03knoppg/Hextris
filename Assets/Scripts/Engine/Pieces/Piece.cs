@@ -13,12 +13,45 @@ public class Piece: MonoBehaviour
 
     public List<GameHex> hexes = new List<GameHex>();
     public GameHex GameHexPrefab;
-    int rotation = 0;
-    float rotationRate = 0;
+    public int rotation = 0;
+    public float rotationRate = 0;
 
 
-    public Mode mode;
-    public enum Mode
+    EMode mode;
+    public EMode Mode
+    {
+        get { return mode; }
+        set
+        {
+            switch (value)
+            {
+                case EMode.Selected:
+                    foreach (GameHex ghex in hexes)
+                    {
+                        //old pivot hex
+                        if (ghex.IsPivotHex)
+                            ghex.SetColour(Color.green);
+                        else
+                            ghex.SetColour(Color.blue);
+                    }
+                    break;
+
+                case EMode.Active:
+                    foreach (GameHex ghex in hexes)
+                        ghex.SetColour(Color.blue);
+                    break;
+
+                case EMode.Inactive:
+                    foreach (GameHex ghex in hexes)
+                        ghex.SetColour(Color.grey);
+                    break;
+
+
+            }
+            mode = value;
+        }
+    }
+    public enum EMode
     {
         Placement,
         Selected,
@@ -26,7 +59,9 @@ public class Piece: MonoBehaviour
         Inactive
     }
 
-    //the position of each hex is based on the local layout where the mainHex is always at (0,0)
+    //local layout origin is always 0,0
+    //To move the piece simply set the transform position
+    //the position of each hex is based on the local layout where the pivot hex is always at (0,0)
     public Layout localLayout;
 
     public Point Point
@@ -50,15 +85,33 @@ public class Piece: MonoBehaviour
 
     private void HexCollision()
     {
-        if (transform.rotation.eulerAngles.y > rotation * 60)
-            rotation--; 
-        else
-            rotation++;
+        if (mode == EMode.Selected)
+        {
+            if (rotationRate > 0)
+                rotation--;
+            else
+                rotation++;
+        }
     }
 
     void Update()
     {
-        transform.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, rotation * 60, ref rotationRate, 0.5f), 0);
+        //Debug.Log(rotation * 60 + " " + transform.rotation.eulerAngles.y + " " + Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)));
+        //rotate gameObject and detect collisions until near destination then snap to new position
+        if(Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)) > 0.01f)
+            transform.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, rotation * 60, ref rotationRate, 0.5f), 0);
+
+        else if (Mathf.Abs(rotationRate) > 0)
+        {
+            foreach (GameHex gHex in hexes)
+            {
+                gHex.Rotate(rotation);
+                gHex.UpdatePosition(localLayout);
+            }
+            rotationRate = 0;
+            rotation = 0;
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     public void AddHex(Hex hex)
@@ -76,7 +129,7 @@ public class Piece: MonoBehaviour
 
     private void OnHexClicked(GameHex gameHex)
     {
-        if (mode != Mode.Inactive)
+        if (mode != EMode.Inactive)
         {
             if (OnPieceClicked != null)
                 OnPieceClicked(this, gameHex);
@@ -86,6 +139,7 @@ public class Piece: MonoBehaviour
     public void SetPivotHex(GameHex pivotHex)
     {
 
+        transform.position = pivotHex.transform.position;
         Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
 
         foreach(GameHex gameHex in hexes)
@@ -94,41 +148,13 @@ public class Piece: MonoBehaviour
         }
 
         pivotHex.SetColour(Color.green);
-        localLayout = newLocalLayout;
     }
 
     public void Rotate()
     {
-        rotation = (rotation + 1) % 6;
+        if(rotationRate == 0)
+            rotation = -1;
     }
-
-
-
-    public void SetActive(bool active)
-    {
-        if (active)
-        {
-            mode = Mode.Active;
-            foreach (GameHex ghex in hexes)
-            {
-                //old pivot hex
-                if (ghex.IsPivotHex)
-                    ghex.SetColour(Color.green);
-                else
-                    ghex.SetColour(Color.blue);
-            }
-        }
-        else
-        {
-            mode = Mode.Inactive;
-            foreach (GameHex ghex in hexes)
-            {
-                ghex.SetColour(Color.grey);
-            }
-        }
-    }
-
-
 
     internal void SetColor(Color color)
     {
@@ -137,6 +163,8 @@ public class Piece: MonoBehaviour
             gHex.SetColour(color);
         }
     }
+
+
 
 
 }

@@ -46,7 +46,7 @@ public class GameHex : MonoBehaviour
     //positive increments of 60 degrees clockwise
     public void Rotate(int amount)
     {
-        hex = HexCalcs.RotateHex(hex, amount);
+        hex = HexCalcs.RotateHex(hex, -amount);
     }
 
     public void SetColour(Color newColour)
@@ -62,7 +62,8 @@ public class GameHex : MonoBehaviour
 
         //translate into new layout based on new pivot hex
         hex = FractionalHex.HexRound(Layout.PixelToHex(newLayout, Layout.HexToPixel(oldLayout, hex)));
-        UpdatePosition(newLayout);
+        //UpdatePosition(newLayout);
+        UpdatePosition(oldLayout);
     }
 
     public void UpdatePosition(Layout localLayout)

@@ -26,7 +26,7 @@ public class Game : MonoBehaviour {
 
     Board currentBoard;
     GamePhase currentPhase;
-    Piece currentPlacementPiece;
+    Piece currentSelectedPiece;
     int currentPlacementPieceIndex;
     int currentPlayerNum;
 
@@ -76,7 +76,7 @@ public class Game : MonoBehaviour {
 
     void PiecePlaced(Piece piece)
     {
-        piece.mode = Piece.Mode.Inactive;
+        piece.Mode = Piece.EMode.Inactive;
         MakeNextPlacementPiece();
     }
 
@@ -94,11 +94,11 @@ public class Game : MonoBehaviour {
                 Vector3 point = ray.GetPoint(rayDistance);
                 FractionalHex fHex = Layout.PixelToHex(Driver.layout, new Point(point.x, point.z));
                 Point p = Layout.HexToPixel(Driver.layout, FractionalHex.HexRound(fHex));
-                currentPlacementPiece.Point = p;
-                if (IsValidPosition(currentPlacementPiece))
-                    currentPlacementPiece.SetColor(Color.green);
+                currentSelectedPiece.Point = p;
+                if (IsValidPosition(currentSelectedPiece))
+                    currentSelectedPiece.SetColor(Color.green);
                 else
-                    currentPlacementPiece.SetColor(Color.red);
+                    currentSelectedPiece.SetColor(Color.red);
 
             }
             
@@ -122,12 +122,12 @@ public class Game : MonoBehaviour {
             p - currentPlacementPieceIndex % (p + 1), 0, p);
         
         Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(currentPlacementPieceIndex / 2)]);
-        piece.mode = Piece.Mode.Placement;
+        piece.Mode = Piece.EMode.Placement;
         piece.OnPieceClicked += OnPieceClicked;
 
         players[currentPlayerNum].pieces.Add(piece);
 
-        currentPlacementPiece = piece;
+        currentSelectedPiece = piece;
         currentPlacementPieceIndex++;
     }
 
@@ -139,14 +139,20 @@ public class Game : MonoBehaviour {
         }
         if (currentPhase == GamePhase.Main)
         {
-            if (piece.mode != Piece.Mode.Selected || !hex.IsPivotHex)
-            {
-                piece.mode = Piece.Mode.Selected;
-                piece.SetPivotHex(hex);
-            }
-            else
-            {
+            if (piece == currentSelectedPiece && hex.IsPivotHex)
                 piece.Rotate();
+
+            else if (!hex.IsPivotHex)
+                piece.SetPivotHex(hex);
+            
+
+            if (piece != currentSelectedPiece && piece.Mode == Piece.EMode.Active)
+            {
+                if (currentSelectedPiece != null)
+                    currentSelectedPiece.Mode = Piece.EMode.Active;
+
+                piece.Mode = Piece.EMode.Selected;
+                currentSelectedPiece = piece;
             }
         }
     }
@@ -154,11 +160,14 @@ public class Game : MonoBehaviour {
     void NextPlayer()
     {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
+        currentSelectedPiece = null;
 
         for (int i = 0; i < players.Count; i++)
         {
             players[i].SetActivePlayer(currentPlayerIndex == i);
         }
+
+
     }
 
     public bool IsValidPosition(Piece piece)
