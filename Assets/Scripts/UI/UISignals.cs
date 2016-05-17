@@ -10,6 +10,7 @@ public class UISignals : MonoBehaviour
     {
         EndTurn,
         RotateCW,
+        RotateUndo,
         RotateCCW
     };
 

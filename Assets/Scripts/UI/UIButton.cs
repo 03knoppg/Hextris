@@ -2,21 +2,16 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class UIButton : MonoBehaviour {
+public class UIButton : UIThing {
 
     public UISignals.UISignal signal;
-    public UIStates.Group group;
-
     UISignals UISignals;
-    UIStates UIState;
 
 	// Use this for initialization
-    void Start()
+    protected void Start()
     {
+        base.Start();
         UISignals = GetComponentInParent<UISignals>();
-        UIState = GetComponentInParent<UIStates>();
-
-        UIState.GetEvent(group).AddListener(OnStateChanged);
         GetComponent<Button>().onClick.AddListener(Click);
 	}
 
@@ -24,8 +19,7 @@ public class UIButton : MonoBehaviour {
     {
         UISignals.Click(signal);
     }
-
-    void OnStateChanged(UIStates.State newState) 
+    /*public override void OnStateChanged(UIStates.State newState)
     {
         switch (newState)
         {
@@ -43,5 +37,6 @@ public class UIButton : MonoBehaviour {
                 break;
 
         }
-    }
+    }*/
+   
 }

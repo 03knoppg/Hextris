@@ -8,6 +8,7 @@ public class UIStates : MonoBehaviour {
 
     public enum State
     {
+        None,
         Hidden,
         Disabled,
         Active
@@ -16,11 +17,12 @@ public class UIStates : MonoBehaviour {
     public enum Group
     {
         PieceControls,
-        EndTurn
+        EndTurn,
+        Player1Win,
+        Player2Win
     };
 
     public class UIStateChange : UnityEvent<State> { };
-    //public Dictionary<Group, UIState> GroupState = new Dictionary<Group, UIState>();
     Dictionary<Group, UIStateChange> GroupStateChanges = new Dictionary<Group, UIStateChange>();
 
 	// Use this for initialization

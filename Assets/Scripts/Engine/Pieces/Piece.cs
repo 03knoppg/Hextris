@@ -16,6 +16,15 @@ public class Piece: MonoBehaviour
     public int rotation = 0;
     public float rotationRate = 0;
 
+    public enum EMode
+    {
+        PlacementValid,
+        PlacementInvalid,
+        Disabled, //other player's turn
+        Selected, //selected piece
+        Active,   //able to be selected
+        Inactive  //unable to be selected
+    }
 
     EMode mode;
     public EMode Mode
@@ -25,38 +34,43 @@ public class Piece: MonoBehaviour
         {
             switch (value)
             {
+                case EMode.PlacementValid:
+                    SetColour(Color.green);
+                    break;
+
+                case EMode.PlacementInvalid:
+                    SetColour(Color.red);
+                    break;
+
                 case EMode.Selected:
                     foreach (GameHex ghex in hexes)
                     {
                         //old pivot hex
                         if (ghex.IsPivotHex)
                             ghex.SetColour(Color.green);
-                        else
+                        else if (rotation == 0)
                             ghex.SetColour(Color.blue);
+                        else
+                            ghex.SetColour(new Color(0.5f, 0.5f, 1));
                     }
                     break;
 
                 case EMode.Active:
-                    foreach (GameHex ghex in hexes)
-                        ghex.SetColour(Color.blue);
+                    SetColour(Color.blue);
                     break;
 
                 case EMode.Inactive:
-                    foreach (GameHex ghex in hexes)
-                        ghex.SetColour(Color.grey);
+                    SetColour(new Color(0.5f, 0.5f, 1));
+                    break;
+
+                case EMode.Disabled:
+                    SetColour(Color.gray);
                     break;
 
 
             }
             mode = value;
         }
-    }
-    public enum EMode
-    {
-        Placement,
-        Selected,
-        Active,
-        Inactive
     }
 
     //local layout origin is always 0,0
@@ -169,7 +183,7 @@ public class Piece: MonoBehaviour
             rotation = (rotation + 1) % 6;
     }
 
-    internal void SetColor(Color color)
+    void SetColour(Color color)
     {
         foreach (GameHex gHex in hexes)
         {

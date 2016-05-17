@@ -27,7 +27,7 @@ public class RectangleBoard : Board
                 newHex.transform.parent = transform;
                 Destroy(newHex.GetComponent<Collider>());
                 
-                newHex.SetColour(Color.red);
+                newHex.SetColour(Color.white);
 
                 newHex.SetPosition(Driver.layout, hex);
 
