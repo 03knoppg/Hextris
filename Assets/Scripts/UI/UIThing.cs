@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(Animator))]
+[RequireComponent(typeof(Animator)), RequireComponent(typeof(CanvasGroup))]
 public class UIThing : MonoBehaviour {
     public UIStates.State state;
     public UIStates.Group group;
@@ -12,12 +12,13 @@ public class UIThing : MonoBehaviour {
     
     void Awake()
     {
-        animator = gameObject.GetComponent<Animator>();
     }
 
 	// Use this for initialization
     protected void Start()
     {
+        animator = gameObject.GetComponent<Animator>();
+
         UIState = GetComponentInParent<UIStates>();
         UIState.GetEvent(group).AddListener(OnStateChanged);
 
@@ -25,15 +26,14 @@ public class UIThing : MonoBehaviour {
         UIStates.State startState = state;
         state = UIStates.State.None;
         OnStateChanged(startState);
+
+
 	}
 
     public virtual void OnStateChanged(UIStates.State newState)
     {
-        if (state == newState)
-            return;
-
-        //if (!animator.isInitialized)
-         //   animator.Rebind();
+        //if (state == newState)
+            //return;
 
         switch (newState)
         {

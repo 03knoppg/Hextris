@@ -43,10 +43,10 @@ public class Game : MonoBehaviour {
     UIStates UIState;
 
     //move these to gameType structure
-    int numPlayers = 2;
+    int numPlayers = 1;
     List<PieceMaker.Shape> shapes = new List<PieceMaker.Shape>()
     {
-        PieceMaker.Shape.I,
+        //PieceMaker.Shape.I,
         PieceMaker.Shape.L
     };
 
@@ -141,13 +141,15 @@ public class Game : MonoBehaviour {
                 allLegal &= IsValidPosition(piece);
             }
 
+            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.rotation != 0;
+
             if (anyTurning || currentSelectedPiece == null)
                 UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
             else
                 UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
 
 
-            if (allLegal && !anyTurning)
+            if (allLegal && !anyTurning && hasTurned)
                 UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Active);
             else
                 UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Disabled);
@@ -221,10 +223,9 @@ public class Game : MonoBehaviour {
         }
 
         //for two players go 01100110 etc.
-        int p = numPlayers - 1;
-        currentPlayerIndex = Mathf.Clamp(Mathf.FloorToInt(totalPieces / (p + 1)) % 2 == 0 ?
-            totalPieces % (p + 1) :
-            p - totalPieces % (p + 1), 0, p);
+        currentPlayerIndex = Mathf.Clamp(Mathf.FloorToInt(totalPieces / numPlayers) % 2 == 0 ?
+            totalPieces % numPlayers :
+            (numPlayers - 1) - totalPieces % numPlayers, 0, (numPlayers - 1));
 
         Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(totalPieces / 2)]);
         piece.OnPieceClicked += OnPieceClicked;
@@ -265,8 +266,11 @@ public class Game : MonoBehaviour {
     void NextPlayer()
     {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
-        currentSelectedPiece.LockRotation();
-        currentSelectedPiece = null;
+        if (currentSelectedPiece != null)
+        {
+            currentSelectedPiece.LockRotation();
+            currentSelectedPiece = null;
+        }
 
         for (int i = 0; i < players.Count; i++)
         {

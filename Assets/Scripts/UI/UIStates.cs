@@ -16,6 +16,7 @@ public class UIStates : MonoBehaviour {
 
     public enum Group
     {
+        None,
         PieceControls,
         EndTurn,
         Player1Win,
@@ -29,7 +30,8 @@ public class UIStates : MonoBehaviour {
 	void Awake () {
         foreach (Group group in Enum.GetValues(typeof(Group)))
         {
-            GroupStateChanges[group] = new UIStateChange();
+            if(group != Group.None)
+                GroupStateChanges[group] = new UIStateChange();
         }
 	}
 

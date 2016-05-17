@@ -12,7 +12,7 @@ public class UIButton : UIThing {
     {
         base.Start();
         UISignals = GetComponentInParent<UISignals>();
-        GetComponent<Button>().onClick.AddListener(Click);
+        GetComponentInChildren<Button>().onClick.AddListener(Click);
 	}
 
     void Click()

@@ -101,7 +101,10 @@ public class Piece: MonoBehaviour
     {
         if (mode == EMode.Selected)
         {
-            rotation = 0;
+            if (rotation > 0)
+                rotation--;
+            else
+                rotation++;
         }
     }
 
@@ -126,6 +129,7 @@ public class Piece: MonoBehaviour
             gHex.Rotate(rotation);
             gHex.UpdatePosition(localLayout);
         }
+
         rotationRate = 0;
         rotation = 0;
         transform.rotation = Quaternion.identity;
@@ -133,7 +137,9 @@ public class Piece: MonoBehaviour
 
     public void ResetRotation()
     {
+        rotationRate = 0;
         rotation = 0;
+        transform.rotation = Quaternion.identity;
     }
 
     public void AddHex(Hex hex)
@@ -175,12 +181,14 @@ public class Piece: MonoBehaviour
     public void RotateCCW()
     {
         if (rotationRate == 0)
-            rotation = (rotation + 5) % 6;
+            //rotation = (rotation + 5) % 6;
+            rotation--;
     }
     public void RotateCW()
     {
         if (rotationRate == 0)
-            rotation = (rotation + 1) % 6;
+            //rotation = (rotation + 1) % 6;
+            rotation++;
     }
 
     void SetColour(Color color)

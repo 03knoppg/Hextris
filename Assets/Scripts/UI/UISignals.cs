@@ -8,6 +8,7 @@ public class UISignals : MonoBehaviour
 {
     public enum UISignal
     {
+        None,
         EndTurn,
         RotateCW,
         RotateUndo,
@@ -21,7 +22,8 @@ public class UISignals : MonoBehaviour
     {
         foreach (UISignal button in Enum.GetValues(typeof(UISignal)))
         {
-            buttonActions[button] = new UIButtonClick();
+            if(button != UISignal.None)
+                buttonActions[button] = new UIButtonClick();
         }
     }
 
