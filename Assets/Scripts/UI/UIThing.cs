@@ -6,13 +6,10 @@ using UnityEngine.EventSystems;
 public class UIThing : MonoBehaviour {
     public UIStates.State state;
     public UIStates.Group group;
-    UIStates UIState;
+    protected UIStates UIState;
 
     Animator animator;
     
-    void Awake()
-    {
-    }
 
 	// Use this for initialization
     protected void Start()
@@ -20,7 +17,8 @@ public class UIThing : MonoBehaviour {
         animator = gameObject.GetComponent<Animator>();
 
         UIState = GetComponentInParent<UIStates>();
-        UIState.GetEvent(group).AddListener(OnStateChanged);
+        if(group != UIStates.Group.None)
+            UIState.GetEvent(group).AddListener(OnStateChanged);
 
         //force transition into startstate
         UIStates.State startState = state;

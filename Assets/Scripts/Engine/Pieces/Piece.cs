@@ -101,6 +101,7 @@ public class Piece: MonoBehaviour
     {
         if (mode == EMode.Selected)
         {
+            rotationRate = 0;
             if (rotation > 0)
                 rotation--;
             else

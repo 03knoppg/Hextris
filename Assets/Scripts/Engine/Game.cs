@@ -46,8 +46,9 @@ public class Game : MonoBehaviour {
     int numPlayers = 1;
     List<PieceMaker.Shape> shapes = new List<PieceMaker.Shape>()
     {
-        //PieceMaker.Shape.I,
-        PieceMaker.Shape.L
+        PieceMaker.Shape.C,
+        PieceMaker.Shape.S,
+        //PieceMaker.Shape.Triangle
     };
 
     public void StartGame()
@@ -108,10 +109,8 @@ public class Game : MonoBehaviour {
 
         if (newPhase == GamePhase.End)
         {
-            if (currentPlayerIndex == 0)
-                UIState.SetGroupState(UIStates.Group.Player1Win, UIStates.State.Active);
-            else
-                UIState.SetGroupState(UIStates.Group.Player2Win, UIStates.State.Active);
+            UIState.winner = currentPlayerIndex;
+            UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
         }
     }
 
@@ -228,11 +227,15 @@ public class Game : MonoBehaviour {
             (numPlayers - 1) - totalPieces % numPlayers, 0, (numPlayers - 1));
 
         Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(totalPieces / 2)]);
+        piece.name = shapes[Mathf.FloorToInt(totalPieces / 2)] + " Player" + (currentPlayerIndex + 1);
         piece.OnPieceClicked += OnPieceClicked;
 
         players[currentPlayerIndex].pieces.Add(piece);
 
         currentSelectedPiece = piece;
+
+
+        UIState.currentPlayer = currentPlayerIndex;
     }
 
     private void OnPieceClicked(Piece piece, GameHex hex)
@@ -266,6 +269,8 @@ public class Game : MonoBehaviour {
     void NextPlayer()
     {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
+        UIState.currentPlayer = currentPlayerIndex;
+
         if (currentSelectedPiece != null)
         {
             currentSelectedPiece.LockRotation();
@@ -284,6 +289,23 @@ public class Game : MonoBehaviour {
     {
         if (currentPhase == GamePhase.Setup)
         {
+            foreach (Player player in players)
+            {
+                foreach (Piece otherPiece in player.pieces)
+                {
+                    if (otherPiece == piece)
+                        continue;
+
+                    foreach (GameHex otherHex in otherPiece.hexes)
+                    {
+                        foreach (GameHex hex in piece.hexes)
+                        {
+                            if (otherHex == hex)
+                                return false;
+                        }
+                    }
+                }
+            }
             return IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.legalStartingHexesP1 : currentBoard.legalStartingHexesP2);
         }
         else if (currentPhase == GamePhase.Main)

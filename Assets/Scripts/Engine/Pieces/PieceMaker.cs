@@ -7,19 +7,25 @@ public class PieceMaker : MonoBehaviour
 {
     public Piece PiecePrefab;
 
-    
-	public enum Shape {
-		L, //not yet implemented
-		I
-	};
+
+    public enum Shape
+    {
+        //L, //not yet implemented
+        //I, //not yet implemented
+        Triangle,
+        S,
+        C
+    };
 	
     static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
 	{
-        //Axial coodrdinates
-		{Shape.I, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
+        //Axial coodrdinates?
+		{Shape.Triangle,    new int[4,2]{{0,0},{0,1},{1,0},{0,-1}}},
 
-        //fix this
-		{Shape.L, new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}}
+		{Shape.S,           new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
+
+		{Shape.C,           new int[4,2]{{0,0},{0,1},{0,2},{1,2}}}
+
 		
 		
 	};

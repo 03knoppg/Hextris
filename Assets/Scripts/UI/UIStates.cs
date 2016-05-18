@@ -19,12 +19,14 @@ public class UIStates : MonoBehaviour {
         None,
         PieceControls,
         EndTurn,
-        Player1Win,
-        Player2Win
+        EndGame
     };
 
     public class UIStateChange : UnityEvent<State> { };
     Dictionary<Group, UIStateChange> GroupStateChanges = new Dictionary<Group, UIStateChange>();
+
+    public int winner;
+    public int currentPlayer;
 
 	// Use this for initialization
 	void Awake () {
