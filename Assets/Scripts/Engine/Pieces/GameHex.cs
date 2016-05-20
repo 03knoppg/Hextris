@@ -104,8 +104,8 @@ public class GameHex : MonoBehaviour
         if (a.Equals(b))
             return true;
 
-        return FractionalHex.HexRound(Layout.PixelToHex(Driver.layout, a.GlobalPoint)) ==
-            FractionalHex.HexRound(Layout.PixelToHex(Driver.layout, b.GlobalPoint));
+        return FractionalHex.HexRound(Layout.PixelToHex(Game.layout, a.GlobalPoint)) ==
+            FractionalHex.HexRound(Layout.PixelToHex(Game.layout, b.GlobalPoint));
     }
 
     public static bool operator !=(GameHex a, GameHex b)

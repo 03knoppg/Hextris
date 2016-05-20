@@ -29,7 +29,7 @@ public class RectangleBoard : Board
                 
                 newHex.SetColour(Color.white);
 
-                newHex.SetPosition(Driver.layout, hex);
+                newHex.SetPosition(Game.layout, hex);
 
                 if (col == 0 && row % 2 == 1)
                     legalStartingHexesP1.Add(hex);

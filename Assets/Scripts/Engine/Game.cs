@@ -2,20 +2,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour {
 
     public delegate void GamePhaseChange(GamePhase newPhase);
     public GamePhaseChange OnGamePhaseChange;
-
-    public PieceMaker PieceMakerPrefab;
     
-
+    public static Layout layout;
     public List<Hex> legalStartingHexes;
 
     public enum GameType
     {
-        Classic
+        Classic,
+        Puzzle
     }
 
     public enum GamePhase
@@ -28,6 +28,7 @@ public class Game : MonoBehaviour {
     List<Player> players;
     int currentPlayerIndex = 0;
 
+    int currentBoardIndex = 0;
     Board currentBoard;
     GamePhase currentPhase;
     Piece currentSelectedPiece;
@@ -36,29 +37,37 @@ public class Game : MonoBehaviour {
     GameType type;
 
     [SerializeField]
-    Board BoardPrefab;
+    List<Board> BoardPrefabs;
 
     [SerializeField]
     UISignals UISignals;
     UIStates UIState;
 
-    //move these to gameType structure
-    int numPlayers = 1;
-    List<PieceMaker.Shape> shapes = new List<PieceMaker.Shape>()
+
+    public float size = 0.6f;
+    public int numPlayers = 1;
+    public List<Piece> shapes = new List<Piece>()
     {
-        PieceMaker.Shape.C,
-        PieceMaker.Shape.S,
-        //PieceMaker.Shape.Triangle
     };
 
-    public void StartGame()
+    public void Awake()
     {
-        UIState = FindObjectOfType<UIStates>();
-        UISignals = FindObjectOfType<UISignals>();
 
-        UISignals.AddListeners(UIClick, new List<UISignals.UISignal>() { UISignals.UISignal.RotateCCW, UISignals.UISignal.RotateUndo, UISignals.UISignal.RotateCW, UISignals.UISignal.EndTurn });
+        layout = new Layout(Layout.pointy, new Point(size, size), new Point(0, 0));
+        UIState = gameObject.AddComponent<UIStates>();
+        UISignals = gameObject.AddComponent<UISignals>();
+    }
 
-        currentBoard = Instantiate<Board>(BoardPrefab);
+    void Start()
+    {
+        UISignals.AddListeners(OnUISignal, new List<UISignals.UISignal>() { 
+            UISignals.UISignal.RotateCCW, 
+            UISignals.UISignal.RotateUndo, 
+            UISignals.UISignal.RotateCW, 
+            UISignals.UISignal.EndTurn, 
+            UISignals.UISignal.SelectBoard, 
+            UISignals.UISignal.ShowBoardSelect, 
+            UISignals.UISignal.Quit });
 
         players = new List<Player>();
         for (int i = 0; i < numPlayers; i++)
@@ -68,11 +77,28 @@ public class Game : MonoBehaviour {
             p.Name = "Player" + i;
         }
 
-        SetPhase(GamePhase.Setup);
-        MakeNextPlacementPiece();
+        StartGame();
     }
 
-    public void UIClick(UISignals.UISignal signal)
+    public void StartGame(int boardIndex=0)
+    {
+        if (currentBoard != null)
+            Destroy(currentBoard.gameObject);
+
+        foreach (Player player in players)
+        {
+            player.ClearPieces();
+        }
+
+        currentBoardIndex = boardIndex;
+        currentBoard = Instantiate<Board>(BoardPrefabs[currentBoardIndex]);
+
+        SetPhase(GamePhase.Setup);
+        MakeNextPlacementPiece();
+
+    }
+
+    public void OnUISignal(UISignals.UISignal signal, object arg1)
     {
         switch (signal)
         {
@@ -94,6 +120,20 @@ public class Game : MonoBehaviour {
             case UISignals.UISignal.RotateUndo:
                 currentSelectedPiece.ResetRotation();
                 break;
+            case UISignals.UISignal.SelectBoard:
+                if (arg1 != null)
+                    StartGame((int)arg1);
+                else
+                    StartGame(currentBoardIndex + 1);
+                break;
+            case UISignals.UISignal.ShowBoardSelect:
+                UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
+                UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Active);
+                break;
+            case UISignals.UISignal.Quit:
+                SceneManager.LoadScene("TitleScreen");
+                break;
+
         }
 
     }
@@ -104,9 +144,12 @@ public class Game : MonoBehaviour {
         if (OnGamePhaseChange != null)
             OnGamePhaseChange(currentPhase);
 
-        if(newPhase == GamePhase.Setup)
+        if (newPhase == GamePhase.Setup)
+        {
             UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Hidden);
-
+            UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
+            UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Hidden);
+        }
         if (newPhase == GamePhase.End)
         {
             UIState.winner = currentPlayerIndex;
@@ -122,8 +165,6 @@ public class Game : MonoBehaviour {
 
     void Update()
     {
-        
-
         UpdateUIState();
         UpdatePieceMode();
     }
@@ -167,8 +208,8 @@ public class Game : MonoBehaviour {
             if (hit)
             {
                 Vector3 point = ray.GetPoint(rayDistance);
-                FractionalHex fHex = Layout.PixelToHex(Driver.layout, new Point(point.x, point.z));
-                Point p = Layout.HexToPixel(Driver.layout, FractionalHex.HexRound(fHex));
+                FractionalHex fHex = Layout.PixelToHex(layout, new Point(point.x, point.z));
+                Point p = Layout.HexToPixel(layout, FractionalHex.HexRound(fHex));
 
                 currentSelectedPiece.Point = p;
                 if (IsValidPosition(currentSelectedPiece))
@@ -226,7 +267,7 @@ public class Game : MonoBehaviour {
             totalPieces % numPlayers :
             (numPlayers - 1) - totalPieces % numPlayers, 0, (numPlayers - 1));
 
-        Piece piece = PieceMakerPrefab.Make(shapes[Mathf.FloorToInt(totalPieces / 2)]);
+        Piece piece = Instantiate<Piece>(shapes[Mathf.FloorToInt(totalPieces / 2)]);
         piece.name = shapes[Mathf.FloorToInt(totalPieces / 2)] + " Player" + (currentPlayerIndex + 1);
         piece.OnPieceClicked += OnPieceClicked;
 
@@ -312,7 +353,7 @@ public class Game : MonoBehaviour {
         {
             foreach (GameHex gHex in piece.hexes)
             {
-                Hex hex = FractionalHex.HexRound(Layout.PixelToHex(Driver.layout,  gHex.GlobalPoint));
+                Hex hex = FractionalHex.HexRound(Layout.PixelToHex(layout,  gHex.GlobalPoint));
 
                 if (!currentBoard.InBounds(hex))
                     return false;
@@ -339,7 +380,7 @@ public class Game : MonoBehaviour {
         bool touchingLegalArea = false;
         foreach (GameHex gHex in piece.hexes)
         {
-            Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(Driver.layout, gHex.GlobalPoint));
+            Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(layout, gHex.GlobalPoint));
             if (!currentBoard.InBounds(globalHex))
                 return false;
 

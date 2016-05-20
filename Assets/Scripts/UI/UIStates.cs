@@ -19,7 +19,8 @@ public class UIStates : MonoBehaviour {
         None,
         PieceControls,
         EndTurn,
-        EndGame
+        EndGame,
+        PuzzleSelection
     };
 
     public class UIStateChange : UnityEvent<State> { };

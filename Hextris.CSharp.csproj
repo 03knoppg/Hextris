@@ -70,16 +70,18 @@
     <Compile Include="Assets\Scripts\Engine\HexLib.cs" />
     <Compile Include="Assets\Scripts\Engine\Pieces\GameHex.cs" />
     <Compile Include="Assets\Scripts\Engine\Pieces\Piece.cs" />
-    <Compile Include="Assets\Scripts\Engine\Pieces\PieceMaker.cs" />
     <Compile Include="Assets\Scripts\Engine\Player.cs" />
     <Compile Include="Assets\Scripts\Engine\Utils\HexCalcs.cs" />
     <Compile Include="Assets\Scripts\UI\CurrentPlayerText.cs" />
     <Compile Include="Assets\Scripts\UI\GameOverText.cs" />
+    <Compile Include="Assets\Scripts\UI\PuzzleSelectButton.cs" />
+    <Compile Include="Assets\Scripts\UI\TitleScreen.cs" />
     <Compile Include="Assets\Scripts\UI\UIButton.cs" />
     <Compile Include="Assets\Scripts\UI\UISignals.cs" />
     <Compile Include="Assets\Scripts\UI\UIStates.cs" />
     <Compile Include="Assets\Scripts\UI\UIThing.cs" />
     <Compile Include="Assets\Scripts\test\Driver.cs" />
+    <Compile Include="Assets\Scripts\test\Test.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

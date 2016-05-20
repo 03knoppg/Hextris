@@ -13,8 +13,27 @@ public class Piece: MonoBehaviour
 
     public List<GameHex> hexes = new List<GameHex>();
     public GameHex GameHexPrefab;
+
+    public Shape shape;
     public int rotation = 0;
     public float rotationRate = 0;
+
+    public enum Shape
+    {
+        //L, //not yet implemented
+        //I, //not yet implemented
+        Triangle,
+        S,
+        C
+    };
+
+    static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
+	{
+        //Axial coodrdinates?
+		{Shape.Triangle,    new int[4,2]{{0,0},{0,1},{1,0},{0,-1}}},
+		{Shape.S,           new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
+		{Shape.C,           new int[4,2]{{0,0},{0,1},{0,2},{1,2}}}
+	};
 
     public enum EMode
     {
@@ -86,11 +105,18 @@ public class Piece: MonoBehaviour
 
     void Awake()
     {
-        localLayout = new Layout(Driver.layout.orientation, Driver.layout.size, new Point(0, 0));
+        localLayout = new Layout(Game.layout.orientation, Game.layout.size, new Point(0, 0));
     }
 
     void Start()
     {
+        int[,] points = shapes[shape];
+        for (int i = 0; i < points.Length / 2; i++)
+        {
+            Hex hex = OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, new OffsetCoord(points[i, 0], points[i, 1]));
+            AddHex(hex);
+        }
+
         foreach (GameHex gHex in hexes)
         {
             gHex.OnCollision += HexCollision;

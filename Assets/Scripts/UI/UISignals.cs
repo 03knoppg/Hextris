@@ -12,10 +12,14 @@ public class UISignals : MonoBehaviour
         EndTurn,
         RotateCW,
         RotateUndo,
-        RotateCCW
+        RotateCCW,
+        SelectBoard,
+        ShowBoardSelect,
+        Quit
     };
 
-    public class UIButtonClick : UnityEvent<UISignal> { };
+    //public class UIButtonClick : UnityEvent<UISignal> { };
+    public class UIButtonClick : UnityEvent<UISignal, object> { };
     Dictionary<UISignal, UIButtonClick> buttonActions = new Dictionary<UISignal, UIButtonClick>();
 
     void Awake()
@@ -27,14 +31,14 @@ public class UISignals : MonoBehaviour
         }
     }
 
-    public void AddListeners(UnityAction<UISignal> UIClick, List<UISignal> list)
+    public void AddListeners(UnityAction<UISignal, object> UIClick, List<UISignal> list)
     {
         foreach (UISignal button in list)
             buttonActions[button].AddListener(UIClick);
     }
 
-    public void Click(UISignal button) 
+    public void Click(UISignal button, object arg1 = null)
     {
-        buttonActions[button].Invoke(button);
+        buttonActions[button].Invoke(button, arg1);
     }
 }

@@ -24,4 +24,12 @@ public class Player {
             p.Mode = Piece.EMode.Active;
         }
     }
+
+    internal void ClearPieces()
+    {
+        foreach (Piece piece in pieces)
+            GameObject.Destroy(piece.gameObject);
+
+        pieces.Clear();
+    }
 }

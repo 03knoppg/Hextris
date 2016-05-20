@@ -16,11 +16,11 @@ public class UIThing : MonoBehaviour {
     {
         animator = gameObject.GetComponent<Animator>();
 
-        UIState = GetComponentInParent<UIStates>();
+        UIState = FindObjectOfType<UIStates>();
         if(group != UIStates.Group.None)
             UIState.GetEvent(group).AddListener(OnStateChanged);
 
-        //force transition into startstate
+        //force animator into startstate
         UIStates.State startState = state;
         state = UIStates.State.None;
         OnStateChanged(startState);
@@ -30,8 +30,8 @@ public class UIThing : MonoBehaviour {
 
     public virtual void OnStateChanged(UIStates.State newState)
     {
-        //if (state == newState)
-            //return;
+        if (state == newState || newState == UIStates.State.None)
+            return;
 
         switch (newState)
         {
