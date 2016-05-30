@@ -4,14 +4,13 @@ using UnityEngine.UI;
 
 public class UIButton : UIThing {
 
-    public UISignals.UISignal signal;
-    protected UISignals UISignals;
+    public UISignal signal;
 
 	// Use this for initialization
     protected new void Start()
     {
         base.Start();
-        UISignals = FindObjectOfType<UISignals>();
+
         GetComponentInChildren<Button>().onClick.AddListener(Click);
 	}
 

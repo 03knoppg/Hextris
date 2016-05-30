@@ -7,6 +7,7 @@ public class UIThing : MonoBehaviour {
     public UIStates.State state;
     public UIStates.Group group;
     protected UIStates UIState;
+    protected UISignals UISignals;
 
     Animator animator;
     
@@ -17,6 +18,7 @@ public class UIThing : MonoBehaviour {
         animator = gameObject.GetComponent<Animator>();
 
         UIState = FindObjectOfType<UIStates>();
+        UISignals = FindObjectOfType<UISignals>();
         if(group != UIStates.Group.None)
             UIState.GetEvent(group).AddListener(OnStateChanged);
 

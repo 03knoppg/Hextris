@@ -9,7 +9,7 @@ public class Driver : MonoBehaviour
 
 
 	void Awake(){
-        Game newGame = Instantiate<Game>(GamePrefab);
+       Instantiate<Game>(GamePrefab);
 	}
 
 

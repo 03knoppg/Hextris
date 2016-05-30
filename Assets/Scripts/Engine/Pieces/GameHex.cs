@@ -8,14 +8,24 @@ using UnityEngine;
 public class GameHex : MonoBehaviour
 {
     [SerializeField]
-    Hex hex;
+    //public?
+    public Hex hex;
+
+    public MeshRenderer inner;
+    public List<MeshRenderer> corners;
 
 
     public delegate void ClickAction(GameHex hex);
-    public event ClickAction OnClicked;
+    public event ClickAction OnHexClicked;
+
+    public delegate void MouseDownAction(GameHex hex);
+    public event MouseDownAction OnHexMouseDown;
 
     public delegate void Collision();
     public event Collision OnCollision;
+
+    public delegate void CollisionExit();
+    public event CollisionExit OnCollisionExit;
 
     public bool IsPivotHex
     {
@@ -46,8 +56,14 @@ public class GameHex : MonoBehaviour
 
     void OnMouseUpAsButton()
     {
-        if(OnClicked != null)
-            OnClicked(this);
+        if (OnHexClicked != null)
+            OnHexClicked(this);
+    }
+
+    void OnMouseDown()
+    {
+        if (OnHexMouseDown != null)
+            OnHexMouseDown(this);
     }
 
     //positive increments of 60 degrees clockwise
@@ -56,17 +72,8 @@ public class GameHex : MonoBehaviour
         hex = HexCalcs.RotateHex(hex, -amount);
     }
 
-    public void SetColour(Color newColour)
-    {
-        GetComponent<Renderer>().material.SetColor("_Color", newColour);
-    }
-
     public void UpdateLayout(Layout oldLayout, Layout newLayout)
     {
-        //old pivot hex
-        if (IsPivotHex)
-            SetColour(Color.blue);
-
         //translate into new layout based on new pivot hex
         hex = FractionalHex.HexRound(Layout.PixelToHex(newLayout, Layout.HexToPixel(oldLayout, hex)));
         //UpdatePosition(newLayout);
@@ -99,6 +106,12 @@ public class GameHex : MonoBehaviour
             OnCollision();
     }
 
+    void OnTriggerExit(Collider other)
+    {
+        if (OnCollisionExit != null)
+            OnCollisionExit();
+    }
+
     public static bool operator ==(GameHex a, GameHex b) 
     {
         if (a.Equals(b))
@@ -111,6 +124,18 @@ public class GameHex : MonoBehaviour
     public static bool operator !=(GameHex a, GameHex b)
     {
         return !(a == b);
+    }
+
+    internal void SetColourInner(Material mat)
+    {
+        inner.sharedMaterials = new Material[] { inner.sharedMaterials[0], mat };
+    }
+
+    internal void SetColourOuter(Material mat)
+    {
+        inner.sharedMaterials = new Material[] { mat, inner.sharedMaterials[1] };
+        foreach (MeshRenderer corner in corners)
+            corner.material = mat;
     }
 }
 

@@ -1,12 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class CurrentPlayerText : UIThing {
 
-    public void Update()
+    void Start()
     {
-        GetComponentInChildren<Text>().text = "Player " + (UIState.currentPlayer + 1) + "'s turn";
-        
+        base.Start();
+        UISignals.AddListeners(OnPlayerChange, new List<UISignal>(){UISignal.PlayerTurn}); 
+    }
+
+    void OnPlayerChange(UISignal Signal, object playerIndexObj)
+    {
+        if(Signal == global::UISignal.PlayerTurn)
+            GetComponentInChildren<Text>().text = "Player " + (((int)playerIndexObj) + 1) + "'s turn";
     }
 }

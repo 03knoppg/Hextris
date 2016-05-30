@@ -11,6 +11,8 @@ public class RectangleBoard : Board
     {
         name = "RectangleBoard";
 
+        gameHexes = new List<GameHex>();
+
         GameHex newHex;
         Hexes = new Hex[columns, rows];
 
@@ -25,11 +27,12 @@ public class RectangleBoard : Board
 
                 newHex = Instantiate<GameHex>(GameHexPrefab);
                 newHex.transform.parent = transform;
+                gameHexes.Add(newHex);
                 Destroy(newHex.GetComponent<Collider>());
                 
-                newHex.SetColour(Color.white);
-
                 newHex.SetPosition(Game.layout, hex);
+                foreach (MeshRenderer corner in newHex.corners)
+                    corner.gameObject.SetActive(true);
 
                 if (col == 0 && row % 2 == 1)
                     legalStartingHexesP1.Add(hex);

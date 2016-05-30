@@ -4,19 +4,23 @@ using UnityEngine.Events;
 using System.Collections.Generic;
 using System;
 
+public enum UISignal
+{
+    None,
+    EndTurn,
+    RotateCW,
+    RotateUndo,
+    RotateCCW,
+    SelectBoard,
+    ShowBoardSelect,
+    Quit,
+    PlayerTurn,
+    PlayerWin
+};
+
 public class UISignals : MonoBehaviour
 {
-    public enum UISignal
-    {
-        None,
-        EndTurn,
-        RotateCW,
-        RotateUndo,
-        RotateCCW,
-        SelectBoard,
-        ShowBoardSelect,
-        Quit
-    };
+    
 
     //public class UIButtonClick : UnityEvent<UISignal> { };
     public class UIButtonClick : UnityEvent<UISignal, object> { };

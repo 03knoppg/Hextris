@@ -15,13 +15,27 @@ public class Piece: MonoBehaviour
     public GameHex GameHexPrefab;
 
     public Shape shape;
-    public int rotation = 0;
+    public int targetRotation = 0;
+    public int lastGoodRotation = 0;
+    public float rotationFloat = 0;
     public float rotationRate = 0;
+    public float oldRotateAngle = 0;
+
+    public float realRotationFloat = 0;
+    public bool colliding = false;
+
+    public Material OuterInactive;
+    public Material OuterPivot;
+    public Material OuterSelected;
+    public Material InnerActive;
+    public Material InnerDisabled;
+
 
     public enum Shape
     {
         //L, //not yet implemented
         //I, //not yet implemented
+        Two,
         Triangle,
         S,
         C
@@ -30,6 +44,7 @@ public class Piece: MonoBehaviour
     static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
 	{
         //Axial coodrdinates?
+		{Shape.Triangle,    new int[2,2]{{0,0},{0,1}}},
 		{Shape.Triangle,    new int[4,2]{{0,0},{0,1},{1,0},{0,-1}}},
 		{Shape.S,           new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
 		{Shape.C,           new int[4,2]{{0,0},{0,1},{0,2},{1,2}}}
@@ -54,11 +69,13 @@ public class Piece: MonoBehaviour
             switch (value)
             {
                 case EMode.PlacementValid:
-                    SetColour(Color.green);
+                    SetColourInner(InnerActive);
+                    SetColourOuter(OuterSelected);
                     break;
 
                 case EMode.PlacementInvalid:
-                    SetColour(Color.red);
+                    SetColourInner(InnerDisabled);
+                    SetColourOuter(OuterSelected);
                     break;
 
                 case EMode.Selected:
@@ -66,24 +83,24 @@ public class Piece: MonoBehaviour
                     {
                         //old pivot hex
                         if (ghex.IsPivotHex)
-                            ghex.SetColour(Color.green);
-                        else if (rotation == 0)
-                            ghex.SetColour(Color.blue);
+                            ghex.SetColourOuter(OuterPivot);
+                        else if (targetRotation == 0)
+                            ghex.SetColourOuter(OuterSelected);
                         else
-                            ghex.SetColour(new Color(0.5f, 0.5f, 1));
+                            ghex.SetColourOuter(OuterInactive);
                     }
                     break;
 
                 case EMode.Active:
-                    SetColour(Color.blue);
+                    SetColourOuter(OuterSelected);
                     break;
 
                 case EMode.Inactive:
-                    SetColour(new Color(0.5f, 0.5f, 1));
+                    SetColourOuter(OuterInactive);
                     break;
 
                 case EMode.Disabled:
-                    SetColour(Color.gray);
+                    SetColourInner(InnerDisabled);
                     break;
 
 
@@ -116,10 +133,39 @@ public class Piece: MonoBehaviour
             Hex hex = OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, new OffsetCoord(points[i, 0], points[i, 1]));
             AddHex(hex);
         }
-
         foreach (GameHex gHex in hexes)
         {
             gHex.OnCollision += HexCollision;
+            gHex.OnCollisionExit += HexCollisionExit;
+        }
+
+        FixCorners();
+
+        SetColourInner(InnerActive);
+        SetColourOuter(OuterSelected);
+    }
+
+
+    private void FixCorners()
+    {
+        foreach (GameHex gHex in hexes)
+        {
+            foreach (MeshRenderer corner in gHex.corners)
+                corner.gameObject.SetActive(false);
+
+            for (int direction = 0; direction < 6; direction++)
+            {
+                Hex neighbour = Hex.Neighbor(gHex.hex, direction);
+                foreach (GameHex gHex2 in hexes)
+                {
+                    if (gHex2.hex == neighbour)
+                    {
+
+                        gHex.corners[(direction + 5) % 6].gameObject.SetActive(true);
+                        gHex.corners[direction].gameObject.SetActive(true);
+                    }
+                }
+            }
         }
     }
 
@@ -127,45 +173,89 @@ public class Piece: MonoBehaviour
     {
         if (mode == EMode.Selected)
         {
+            rotationFloat = 0;
             rotationRate = 0;
-            if (rotation > 0)
-                rotation--;
-            else
-                rotation++;
+            targetRotation = lastGoodRotation;
+            colliding = true;
         }
+    }
+    private void HexCollisionExit()
+    {
+        colliding = false;
     }
 
     void Update()
     {
-        //Debug.Log(rotation * 60 + " " + transform.rotation.eulerAngles.y + " " + Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)));
+        if (mode == EMode.Selected && Input.GetMouseButton(0) && !colliding)
+        {
+            Vector3 mouseOffset = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
+            float pointerDistance = mouseOffset.magnitude;
+            if (pointerDistance > 50)
+            {
+                float mouseAngle = Mathf.Atan2(mouseOffset.x, mouseOffset.y);
+                float rotationDelta = mouseAngle - oldRotateAngle;
+                if (oldRotateAngle != 100 && Mathf.Abs(rotationDelta) < 1)
+                {
+                    //Debug.Log(rotationDelta);
+                    rotationFloat += rotationDelta;
+                    if (Mathf.Abs(rotationFloat) > Mathf.PI / 3)
+                    {
+                        if (rotationFloat > 0)
+                            targetRotation++;
+                        else if (rotationFloat < 0)
+                            targetRotation--;
+
+                        rotationFloat = 0;
+                    }
+                }
+                oldRotateAngle = mouseAngle;
+            }
+            else
+                oldRotateAngle = 100;
+            //Debug.Log(mouseOffset);
+        }
+       
+        
         //rotate gameObject and detect collisions until near destination then snap to new position
-        if(Mathf.Abs(Mathf.DeltaAngle(rotation * 60, transform.rotation.eulerAngles.y)) > 0.05f)
-            transform.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(transform.rotation.eulerAngles.y, rotation * 60, ref rotationRate, 0.3f), 0);
+
+
+        if (Mathf.Abs(Mathf.DeltaAngle(targetRotation * 60, transform.rotation.eulerAngles.y)) > 0.05f)
+            realRotationFloat = Mathf.SmoothDampAngle(realRotationFloat, targetRotation * 60, ref rotationRate, 0.3f);
 
         else if (Mathf.Abs(rotationRate) > 0)
         {
+            transform.rotation = Quaternion.Euler(0, targetRotation * 60, 0);
             rotationRate = 0;
         }
-    
+
+        if (realRotationFloat - lastGoodRotation * 60 > 60)
+            lastGoodRotation ++;
+        else if(realRotationFloat - lastGoodRotation * 60 < -60)
+            lastGoodRotation--;
+           
+
+        transform.rotation = Quaternion.Euler(0, realRotationFloat, 0);
     }
 
     public void LockRotation()
     {
         foreach (GameHex gHex in hexes)
         {
-            gHex.Rotate(rotation);
+            gHex.Rotate(targetRotation);
             gHex.UpdatePosition(localLayout);
         }
+        FixCorners();
 
         rotationRate = 0;
-        rotation = 0;
+        rotationFloat = 0;
+        targetRotation = 0;
         transform.rotation = Quaternion.identity;
     }
 
     public void ResetRotation()
     {
         rotationRate = 0;
-        rotation = 0;
+        targetRotation = 0;
         transform.rotation = Quaternion.identity;
     }
 
@@ -174,12 +264,22 @@ public class Piece: MonoBehaviour
         GameHex newGameHex = Instantiate<GameHex>(GameHexPrefab);
 
         newGameHex.transform.parent = transform;
-        newGameHex.OnClicked += OnHexClicked;
+        newGameHex.OnHexClicked += OnHexClicked;
+        newGameHex.OnHexMouseDown += OnHexMouseDown;
         newGameHex.SetPosition(localLayout, hex);
 
         hexes.Add(newGameHex);
         if (hexes.Count == 1)
             SetPivotHex(newGameHex);
+    }
+
+    private void OnHexMouseDown(GameHex gameHex)
+    {
+        if (rotationRate == 0 && mode == EMode.Active)
+        {
+            if (OnPieceClicked != null)
+                OnPieceClicked(this, gameHex);
+        }
     }
 
     private void OnHexClicked(GameHex gameHex)
@@ -200,29 +300,37 @@ public class Piece: MonoBehaviour
         foreach(GameHex gameHex in hexes)
         {
             gameHex.UpdateLayout(localLayout, newLocalLayout);
+            pivotHex.SetColourOuter(OuterSelected);
         }
 
-        pivotHex.SetColour(Color.green);
+        pivotHex.SetColourOuter(OuterPivot);
     }
 
     public void RotateCCW()
     {
         if (rotationRate == 0)
             //rotation = (rotation + 5) % 6;
-            rotation--;
+            targetRotation--;
     }
     public void RotateCW()
     {
         if (rotationRate == 0)
             //rotation = (rotation + 1) % 6;
-            rotation++;
+            targetRotation++;
     }
 
-    void SetColour(Color color)
+    void SetColourInner(Material mat)
     {
         foreach (GameHex gHex in hexes)
         {
-            gHex.SetColour(color);
+            gHex.SetColourInner(mat);
+        }
+    }
+    void SetColourOuter(Material mat)
+    {
+        foreach (GameHex gHex in hexes)
+        {
+            gHex.SetColourOuter(mat);
         }
     }
 }

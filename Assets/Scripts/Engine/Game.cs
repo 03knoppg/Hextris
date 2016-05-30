@@ -50,6 +50,16 @@ public class Game : MonoBehaviour {
     {
     };
 
+
+
+    public Material OuterInactive;
+    public Material OuterPivot;
+    public Material OuterSelected;
+    public Material P1InnerActive;
+    public Material P1InnerDisabled;
+    public Material P2InnerActive;
+    public Material P2InnerDisabled;
+
     public void Awake()
     {
 
@@ -60,14 +70,14 @@ public class Game : MonoBehaviour {
 
     void Start()
     {
-        UISignals.AddListeners(OnUISignal, new List<UISignals.UISignal>() { 
-            UISignals.UISignal.RotateCCW, 
-            UISignals.UISignal.RotateUndo, 
-            UISignals.UISignal.RotateCW, 
-            UISignals.UISignal.EndTurn, 
-            UISignals.UISignal.SelectBoard, 
-            UISignals.UISignal.ShowBoardSelect, 
-            UISignals.UISignal.Quit });
+        UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
+            UISignal.RotateCCW, 
+            UISignal.RotateUndo, 
+            UISignal.RotateCW, 
+            UISignal.EndTurn, 
+            UISignal.SelectBoard, 
+            UISignal.ShowBoardSelect, 
+            UISignal.Quit });
 
         players = new List<Player>();
         for (int i = 0; i < numPlayers; i++)
@@ -98,11 +108,11 @@ public class Game : MonoBehaviour {
 
     }
 
-    public void OnUISignal(UISignals.UISignal signal, object arg1)
+    public void OnUISignal(UISignal signal, object arg1)
     {
         switch (signal)
         {
-            case UISignals.UISignal.EndTurn:
+            case UISignal.EndTurn:
                 if (IsPlayerWin())
                 {
                     SetPhase(GamePhase.End);
@@ -111,26 +121,26 @@ public class Game : MonoBehaviour {
                 else
                     NextPlayer();
                 break;
-            case UISignals.UISignal.RotateCCW:
+            case UISignal.RotateCCW:
                 currentSelectedPiece.RotateCCW();
                 break;
-            case UISignals.UISignal.RotateCW:
+            case UISignal.RotateCW:
                 currentSelectedPiece.RotateCW();
                 break;
-            case UISignals.UISignal.RotateUndo:
+            case UISignal.RotateUndo:
                 currentSelectedPiece.ResetRotation();
                 break;
-            case UISignals.UISignal.SelectBoard:
+            case UISignal.SelectBoard:
                 if (arg1 != null)
                     StartGame((int)arg1);
                 else
                     StartGame(currentBoardIndex + 1);
                 break;
-            case UISignals.UISignal.ShowBoardSelect:
+            case UISignal.ShowBoardSelect:
                 UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
                 UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Active);
                 break;
-            case UISignals.UISignal.Quit:
+            case UISignal.Quit:
                 SceneManager.LoadScene("TitleScreen");
                 break;
 
@@ -152,7 +162,8 @@ public class Game : MonoBehaviour {
         }
         if (newPhase == GamePhase.End)
         {
-            UIState.winner = currentPlayerIndex;
+            //UIState.winner = currentPlayerIndex;
+            UISignals.Click(global::UISignal.PlayerWin, currentPlayerIndex);
             UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
         }
     }
@@ -181,7 +192,7 @@ public class Game : MonoBehaviour {
                 allLegal &= IsValidPosition(piece);
             }
 
-            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.rotation != 0;
+            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation != 0;
 
             if (anyTurning || currentSelectedPiece == null)
                 UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
@@ -233,7 +244,7 @@ public class Game : MonoBehaviour {
                         if (currentSelectedPiece == piece)
                             piece.Mode = Piece.EMode.Selected;
 
-                        else if (currentSelectedPiece == null || currentSelectedPiece.rotation == 0)
+                        else if (currentSelectedPiece == null || currentSelectedPiece.targetRotation == 0)
                             piece.Mode = Piece.EMode.Active;
 
                         else
@@ -270,13 +281,18 @@ public class Game : MonoBehaviour {
         Piece piece = Instantiate<Piece>(shapes[Mathf.FloorToInt(totalPieces / 2)]);
         piece.name = shapes[Mathf.FloorToInt(totalPieces / 2)] + " Player" + (currentPlayerIndex + 1);
         piece.OnPieceClicked += OnPieceClicked;
+        piece.OuterInactive = OuterInactive;
+        piece.OuterPivot = OuterPivot;
+        piece.OuterSelected = OuterSelected;
+        piece.InnerActive = currentPlayerIndex == 0 ? P1InnerActive : P2InnerActive;
+        piece.InnerDisabled = currentPlayerIndex == 0 ? P1InnerDisabled : P2InnerDisabled;
 
         players[currentPlayerIndex].pieces.Add(piece);
 
         currentSelectedPiece = piece;
+        currentBoard.HighlightPlayer(currentPlayerIndex);
 
-
-        UIState.currentPlayer = currentPlayerIndex;
+        UISignals.Click(UISignal.PlayerTurn, currentPlayerIndex);
     }
 
     private void OnPieceClicked(Piece piece, GameHex hex)
@@ -291,7 +307,7 @@ public class Game : MonoBehaviour {
 
             if (!hex.IsPivotHex)
             {
-                if(piece.rotation == 0)
+                if(piece.targetRotation == 0)
                     piece.SetPivotHex(hex);
             }
 
@@ -310,7 +326,9 @@ public class Game : MonoBehaviour {
     void NextPlayer()
     {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
-        UIState.currentPlayer = currentPlayerIndex;
+        
+        currentBoard.HighlightPlayer(currentPlayerIndex + 1);
+        UISignals.Click(UISignal.PlayerTurn, currentPlayerIndex);
 
         if (currentSelectedPiece != null)
         {
@@ -322,8 +340,6 @@ public class Game : MonoBehaviour {
         {
             players[i].SetActivePlayer(currentPlayerIndex == i);
         }
-
-
     }
 
     public bool IsValidPosition(Piece piece)
