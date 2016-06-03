@@ -30,6 +30,13 @@ public struct Point
 }
 
 [Serializable]
+public class HexListWrapper : ScriptableObject
+{
+    public int boardSize = 10;
+    public List<Hex> Hexes;
+}
+
+[Serializable]
 public struct Hex
 {
     public Hex(int q, int r, int s)

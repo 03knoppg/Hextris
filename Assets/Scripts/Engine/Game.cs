@@ -2,15 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
 public class Game : MonoBehaviour {
 
     public delegate void GamePhaseChange(GamePhase newPhase);
     public GamePhaseChange OnGamePhaseChange;
     
-    public static Layout layout;
-    public List<Hex> legalStartingHexes;
+    Layout layout;
 
     public enum GameType
     {
@@ -23,12 +21,11 @@ public class Game : MonoBehaviour {
         Setup,
         Main,
         End
-    }
+    } 
 
     List<Player> players;
     int currentPlayerIndex = 0;
 
-    int currentBoardIndex = 0;
     Board currentBoard;
     GamePhase currentPhase;
     Piece currentSelectedPiece;
@@ -37,16 +34,15 @@ public class Game : MonoBehaviour {
     GameType type;
 
     [SerializeField]
-    List<Board> BoardPrefabs;
+    Board BoardPrefab;
 
-    [SerializeField]
     UISignals UISignals;
     UIStates UIState;
 
 
-    public float size = 0.6f;
+    public float layoutSize = 1;
     public int numPlayers = 1;
-    public List<Piece> shapes = new List<Piece>()
+    public List<Piece.Shape> shapes = new List<Piece.Shape>()
     {
     };
 
@@ -60,24 +56,19 @@ public class Game : MonoBehaviour {
     public Material P2InnerActive;
     public Material P2InnerDisabled;
 
-    public void Awake()
-    {
-
-        layout = new Layout(Layout.pointy, new Point(size, size), new Point(0, 0));
-        UIState = gameObject.AddComponent<UIStates>();
-        UISignals = gameObject.AddComponent<UISignals>();
-    }
 
     void Start()
     {
+        layout = new Layout(Layout.pointy, new Point(layoutSize, layoutSize), new Point(0, 0));
+
+        UISignals = FindObjectOfType<UISignals>();
+        UIState = FindObjectOfType<UIStates>();
+
         UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
             UISignal.RotateCCW, 
             UISignal.RotateUndo, 
             UISignal.RotateCW, 
-            UISignal.EndTurn, 
-            UISignal.SelectBoard, 
-            UISignal.ShowBoardSelect, 
-            UISignal.Quit });
+            UISignal.EndTurn });
 
         players = new List<Player>();
         for (int i = 0; i < numPlayers; i++)
@@ -90,18 +81,10 @@ public class Game : MonoBehaviour {
         StartGame();
     }
 
-    public void StartGame(int boardIndex=0)
+    public void StartGame()
     {
-        if (currentBoard != null)
-            Destroy(currentBoard.gameObject);
 
-        foreach (Player player in players)
-        {
-            player.ClearPieces();
-        }
-
-        currentBoardIndex = boardIndex;
-        currentBoard = Instantiate<Board>(BoardPrefabs[currentBoardIndex]);
+        currentBoard = ObjectFactory.Board(BoardPrefab, layout);
 
         SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
@@ -130,19 +113,6 @@ public class Game : MonoBehaviour {
             case UISignal.RotateUndo:
                 currentSelectedPiece.ResetRotation();
                 break;
-            case UISignal.SelectBoard:
-                if (arg1 != null)
-                    StartGame((int)arg1);
-                else
-                    StartGame(currentBoardIndex + 1);
-                break;
-            case UISignal.ShowBoardSelect:
-                UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
-                UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Active);
-                break;
-            case UISignal.Quit:
-                SceneManager.LoadScene("TitleScreen");
-                break;
 
         }
 
@@ -162,7 +132,6 @@ public class Game : MonoBehaviour {
         }
         if (newPhase == GamePhase.End)
         {
-            //UIState.winner = currentPlayerIndex;
             UISignals.Click(global::UISignal.PlayerWin, currentPlayerIndex);
             UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
         }
@@ -278,8 +247,12 @@ public class Game : MonoBehaviour {
             totalPieces % numPlayers :
             (numPlayers - 1) - totalPieces % numPlayers, 0, (numPlayers - 1));
 
-        Piece piece = Instantiate<Piece>(shapes[Mathf.FloorToInt(totalPieces / 2)]);
-        piece.name = shapes[Mathf.FloorToInt(totalPieces / 2)] + " Player" + (currentPlayerIndex + 1);
+        Piece piece = ObjectFactory.Piece(
+            layout, 
+            shapes[Mathf.FloorToInt(totalPieces / 2)], 
+            players[currentPlayerIndex],
+            2);
+        
         piece.OnPieceClicked += OnPieceClicked;
         piece.OuterInactive = OuterInactive;
         piece.OuterPivot = OuterPivot;
@@ -287,7 +260,6 @@ public class Game : MonoBehaviour {
         piece.InnerActive = currentPlayerIndex == 0 ? P1InnerActive : P2InnerActive;
         piece.InnerDisabled = currentPlayerIndex == 0 ? P1InnerDisabled : P2InnerDisabled;
 
-        players[currentPlayerIndex].pieces.Add(piece);
 
         currentSelectedPiece = piece;
         currentBoard.HighlightPlayer(currentPlayerIndex);
@@ -363,7 +335,7 @@ public class Game : MonoBehaviour {
                     }
                 }
             }
-            return IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.legalStartingHexesP1 : currentBoard.legalStartingHexesP2);
+            return IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.LegalStartingHexesP1 : currentBoard.LegalStartingHexesP2);
         }
         else if (currentPhase == GamePhase.Main)
         {
@@ -384,7 +356,7 @@ public class Game : MonoBehaviour {
     {
         foreach (Piece piece in players[currentPlayerIndex].pieces)
         {
-            if (!IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.legalStartingHexesP2 : currentBoard.legalStartingHexesP1))
+            if (!IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.LegalStartingHexesP2 : currentBoard.LegalStartingHexesP1))
                 return false;
         }
 
@@ -415,4 +387,16 @@ public class Game : MonoBehaviour {
         return touchingLegalArea;
     }
 
+
+    internal void End()
+    {
+        Destroy(currentBoard.gameObject);
+
+        foreach (Player player in players)
+        {
+            player.ClearPieces();
+        }
+
+        Destroy(gameObject);
+    }
 }

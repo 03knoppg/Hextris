@@ -7,14 +7,14 @@ public class RectangleBoard : Board
     public int columns = 15;
     public int rows = 15;
 
-    public override void InitBoard()
+    protected override void BuildBoard()
     {
         name = "RectangleBoard";
 
         gameHexes = new List<GameHex>();
 
         GameHex newHex;
-        Hexes = new Hex[columns, rows];
+        Hex[,] Hexes = new Hex[columns, rows];
 
 		for(int col = 0; col < columns; col ++){
 
@@ -25,23 +25,26 @@ public class RectangleBoard : Board
 
                 Hexes[coord.col, coord.row] = hex;
 
-                newHex = Instantiate<GameHex>(GameHexPrefab);
+                newHex = ObjectFactory.GameHex(globalLayout);
                 newHex.transform.parent = transform;
                 gameHexes.Add(newHex);
                 Destroy(newHex.GetComponent<Collider>());
                 
-                newHex.SetPosition(Game.layout, hex);
+                newHex.SetPosition(globalLayout, hex);
                 foreach (MeshRenderer corner in newHex.corners)
                     corner.gameObject.SetActive(true);
 
-                if (col == 0 && row % 2 == 1)
-                    legalStartingHexesP1.Add(hex);
-                
-                else if (col == columns - 1 && row % 2 == 0)
-                    legalStartingHexesP2.Add(hex);
+                if (col == 0 && (row % 2 == 1 || rows == 1))
+                    LegalStartingHexesP1.Add(hex);
+
+                else if (col == columns - 1 && (row % 2 == 0 || rows == 1))
+                    LegalStartingHexesP2.Add(hex);
             
 			}
 		}
+
+        foreach (Hex hex in Hexes)
+            base.Hexes.Add(hex);
 	}
 }
 

@@ -5,16 +5,16 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6F85C6ED-33CA-5900-F4BA-2A1959DC4067}</ProjectGuid>
+    <ProjectGuid>{9FBC4470-F604-EF7D-C161-4D4BC9D81FBF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
     <CompilerResponseFile></CompilerResponseFile>
-    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityProjectType>Editor:5</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows:5</UnityBuildTarget>
     <UnityVersion>5.3.1f1</UnityVersion>
     <RootNamespace></RootNamespace>
@@ -51,40 +51,54 @@
     <Reference Include="UnityEngine">
       <HintPath>Library\UnityAssemblies\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Advertisements">
+      <HintPath>Library\UnityAssemblies\UnityEditor.Advertisements.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>Library\UnityAssemblies\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.EditorTestsRunner">
+      <HintPath>Library\UnityAssemblies\UnityEditor.EditorTestsRunner.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>Library\UnityAssemblies\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.UI">
+      <HintPath>Library\UnityAssemblies\UnityEditor.UI.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.Networking">
       <HintPath>Library\UnityAssemblies\UnityEngine.Networking.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEditor">
-      <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
+    <Reference Include="UnityEditor.Networking">
+      <HintPath>Library\UnityAssemblies\UnityEditor.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.TreeEditor">
+      <HintPath>Library\UnityAssemblies\UnityEditor.TreeEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.Graphs">
+      <HintPath>Library\UnityAssemblies\UnityEditor.Graphs.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WebGL.Extensions">
+      <HintPath>Library\UnityAssemblies\UnityEditor.WebGL.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+      <HintPath>Library\UnityAssemblies\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
+      <HintPath>Library\UnityAssemblies\SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Camera.cs" />
-    <Compile Include="Assets\Scripts\Engine\Boards\Board.cs" />
-    <Compile Include="Assets\Scripts\Engine\Boards\BoardShape.cs" />
-    <Compile Include="Assets\Scripts\Engine\Boards\CustomBoard.cs" />
-    <Compile Include="Assets\Scripts\Engine\Boards\RectangleBoard.cs" />
-    <Compile Include="Assets\Scripts\Engine\Game.cs" />
-    <Compile Include="Assets\Scripts\Engine\HexLib.cs" />
-    <Compile Include="Assets\Scripts\Engine\Pieces\GameHex.cs" />
-    <Compile Include="Assets\Scripts\Engine\Pieces\Piece.cs" />
-    <Compile Include="Assets\Scripts\Engine\Player.cs" />
-    <Compile Include="Assets\Scripts\Engine\Utils\HexBuilder.cs" />
-    <Compile Include="Assets\Scripts\Engine\Utils\HexCalcs.cs" />
-    <Compile Include="Assets\Scripts\ObjectFactory.cs" />
-    <Compile Include="Assets\Scripts\UI\CurrentPlayerText.cs" />
-    <Compile Include="Assets\Scripts\UI\GameOverText.cs" />
-    <Compile Include="Assets\Scripts\UI\PuzzleSelectButton.cs" />
-    <Compile Include="Assets\Scripts\UI\TitleScreen.cs" />
-    <Compile Include="Assets\Scripts\UI\UIButton.cs" />
-    <Compile Include="Assets\Scripts\UI\UISignals.cs" />
-    <Compile Include="Assets\Scripts\UI\UIStates.cs" />
-    <Compile Include="Assets\Scripts\UI\UIThing.cs" />
-    <Compile Include="Assets\Scripts\test\Driver.cs" />
-    <Compile Include="Assets\Scripts\test\Test.cs" />
+    <ProjectReference Include="Hextris.CSharp.csproj">
+      <Project>{6F85C6ED-33CA-5900-F4BA-2A1959DC4067}</Project>
+      <Name>Hextris.CSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\Scripts\Editor\HexDrawer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2013\UnityVS.CSharp.targets" />
 </Project>

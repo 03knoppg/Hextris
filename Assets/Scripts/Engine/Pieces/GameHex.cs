@@ -10,6 +10,7 @@ public class GameHex : MonoBehaviour
     [SerializeField]
     //public?
     public Hex hex;
+    public static Layout GolbalLayout;
 
     public MeshRenderer inner;
     public List<MeshRenderer> corners;
@@ -52,6 +53,11 @@ public class GameHex : MonoBehaviour
     void Awake()
     {
         hex = new Hex();
+    }
+
+    public void Init(Layout globalLayout)
+    {
+        GolbalLayout = globalLayout;
     }
 
     void OnMouseUpAsButton()
@@ -117,8 +123,8 @@ public class GameHex : MonoBehaviour
         if (a.Equals(b))
             return true;
 
-        return FractionalHex.HexRound(Layout.PixelToHex(Game.layout, a.GlobalPoint)) ==
-            FractionalHex.HexRound(Layout.PixelToHex(Game.layout, b.GlobalPoint));
+        return FractionalHex.HexRound(Layout.PixelToHex(GolbalLayout, a.GlobalPoint)) ==
+            FractionalHex.HexRound(Layout.PixelToHex(GolbalLayout, b.GlobalPoint));
     }
 
     public static bool operator !=(GameHex a, GameHex b)
