@@ -134,8 +134,10 @@ public class Piece: MonoBehaviour
 
 	public Point Point
 	{
-		get { return new Point(transform.position.x, transform.position.z); }
-		set { transform.localPosition = new Vector3(value.x, 0.2f, value.y); }
+		//get { return new Point(transform.position.x, transform.position.z); }
+		set {
+            transform.localPosition = new Vector3(value.x, 0.2f, value.y);
+        }
 	}
 
     public void Awake()

@@ -20,6 +20,9 @@ public class Driver : MonoBehaviour
     }
     void Start()
     {
+        
+        Tests.TestAll();
+
         UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
             UISignal.SelectBoard,
             UISignal.ShowBoardSelect,

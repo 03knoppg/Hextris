@@ -62,16 +62,13 @@ public abstract class Board : MonoBehaviour{
     {
         foreach(GameHex gHex in piece.Hexes)
         {
-            if(InStartingArea(gHex, playerIndex))
-                return true;
+            Hex tempHex = FractionalHex.HexRound(Layout.PixelToHex(globalLayout, gHex.GlobalPoint));
+            if (InStartingArea(tempHex, playerIndex))
+                return true;   
         }
         return false;
     }
-    public virtual bool InStartingArea(GameHex gHex, int playerIndex)
-    {
-        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
-        return highlightGameHexes.Contains(gHex);
-    }
+
     public virtual bool InStartingArea(Hex globalHex, int playerIndex)
     {
         List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;

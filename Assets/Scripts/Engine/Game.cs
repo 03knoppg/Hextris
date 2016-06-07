@@ -355,37 +355,13 @@ public class Game : MonoBehaviour {
     {
         foreach (Piece piece in players[currentPlayerIndex].pieces)
         {
-            if (!currentBoard.InStartingArea(piece, (currentPlayerIndex + 1) % 2))
-                return false;
+            if (currentBoard.InStartingArea(piece, (currentPlayerIndex + 1) % 2))
+                return true;
         }
 
-        return true;
+        return false;
     }
-
-    //public bool IsPieceInArea(Piece piece, List<GameHex> hexes)
-    //{
-    //    bool touchingLegalArea = false;
-    //    foreach (GameHex gHex in piece.Hexes)
-    //    {
-    //        Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(layout, gHex.GlobalPoint));
-    //        if (!currentBoard.InBounds(globalHex))
-    //            return false;
-
-    //        if (!touchingLegalArea)
-    //        {
-    //            foreach (GameHex legalHex in hexes)
-    //            {
-    //                if (globalHex.Equals(legalHex.hex))
-    //                {
-    //                    touchingLegalArea = true;
-    //                    break;
-    //                }
-    //            }
-    //        }
-    //    }
-    //    return touchingLegalArea;
-    //}
-
+    
 
     internal void End()
     {

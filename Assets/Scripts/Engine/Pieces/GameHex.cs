@@ -55,6 +55,15 @@ public class GameHex : MonoBehaviour
         hex = new Hex();
     }
 
+    void Update()
+    {
+        OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
+
+        Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(GolbalLayout, GlobalPoint));
+        name = "Hex Global{" + globalHex.q + ", " + globalHex.r + ", " + globalHex.s + "} " + "Offset{" + coord.col + ", " + coord.row + "} Cube{" + hex.q + ", " + hex.r + ", " + hex.s + "}";
+
+    }
+
     public void Init(Layout globalLayout)
     {
         GolbalLayout = globalLayout;
@@ -88,11 +97,11 @@ public class GameHex : MonoBehaviour
 
     public void UpdatePosition(Layout localLayout)
     {
+        //OffsetCoord oc = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
+        //transform.localPosition = new Vector3(oc.col * localLayout.size.x, 0, oc.row * localLayout.size.y);
         Point position = Layout.HexToPixel(localLayout, hex);
         transform.localPosition = new Vector3(position.x, 0, position.y);
 
-        OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
-        name = "Hex{" + coord.col + ", " + coord.row + "}";
     }
 
     public void SetPosition(Layout layout, Hex hex)

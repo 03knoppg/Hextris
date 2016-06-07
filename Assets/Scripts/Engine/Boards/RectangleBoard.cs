@@ -12,7 +12,7 @@ public class RectangleBoard : Board
         name = "RectangleBoard";
         
         GameHex newHex;
-        Hex[,] HexesArray = new Hex[columns, rows];
+        //Hex[,] HexesArray = new Hex[columns, rows];
 
         Hexes = new List<GameHex>();
         LegalStartingHexesP1 = new List<GameHex>();
@@ -23,9 +23,9 @@ public class RectangleBoard : Board
             for (int row = 0; row < rows; row++)
             {
                 Hex hex = OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, new OffsetCoord(col,row));
-                OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
+                //OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
 
-                HexesArray[coord.col, coord.row] = hex;
+                //HexesArray[coord.col, coord.row] = hex;
 
                 newHex = ObjectFactory.GameHex(globalLayout);
                 newHex.transform.parent = transform;

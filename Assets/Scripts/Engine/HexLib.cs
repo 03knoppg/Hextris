@@ -52,13 +52,13 @@ public struct Hex
     public int r;
     public int s;
 
-    static public Hex Add(Hex a, Hex b)
+    public static Hex operator +(Hex a, Hex b)
     {
         return new Hex(a.q + b.q, a.r + b.r, a.s + b.s);
     }
 
 
-    static public Hex Subtract(Hex a, Hex b)
+    public static Hex operator -(Hex a, Hex b)
     {
         return new Hex(a.q - b.q, a.r - b.r, a.s - b.s);
     }
@@ -79,14 +79,14 @@ public struct Hex
 
     static public Hex Neighbor(Hex hex, int direction)
     {
-        return Hex.Add(hex, Hex.Direction(direction));
+        return hex + Hex.Direction(direction);
     }
 
     static public List<Hex> diagonals = new List<Hex> { new Hex(2, -1, -1), new Hex(1, -2, 1), new Hex(-1, -1, 2), new Hex(-2, 1, 1), new Hex(-1, 2, -1), new Hex(1, 1, -2) };
 
     static public Hex DiagonalNeighbor(Hex hex, int direction)
     {
-        return Hex.Add(hex, Hex.diagonals[direction]);
+        return hex + Hex.diagonals[direction];
     }
 
 
@@ -98,7 +98,7 @@ public struct Hex
 
     static public int Distance(Hex a, Hex b)
     {
-        return Hex.Length(Hex.Subtract(a, b));
+        return Hex.Length(a - b);
     }
 
 #region operator overrides
@@ -191,6 +191,7 @@ public struct OffsetCoord
     static public int EVEN = 1;
     static public int ODD = -1;
 
+    //dont use this
     static public OffsetCoord QoffsetFromCube(int offset, Hex h)
     {
         int col = h.q;
@@ -198,7 +199,7 @@ public struct OffsetCoord
         return new OffsetCoord(col, row);
     }
 
-
+    //dont use this
     static public Hex QoffsetToCube(int offset, OffsetCoord h)
     {
         int q = h.col;
@@ -357,8 +358,8 @@ public struct Tests
 
     static public void TestHexArithmetic()
     {
-        Tests.EqualHex("hex_add", new Hex(4, -10, 6), Hex.Add(new Hex(1, -3, 2), new Hex(3, -7, 4)));
-        Tests.EqualHex("hex_subtract", new Hex(-2, 4, -2), Hex.Subtract(new Hex(1, -3, 2), new Hex(3, -7, 4)));
+        Tests.EqualHex("hex_add", new Hex(4, -10, 6), new Hex(1, -3, 2) + new Hex(3, -7, 4));
+        Tests.EqualHex("hex_subtract", new Hex(-2, 4, -2), new Hex(1, -3, 2) - new Hex(3, -7, 4));
     }
 
 

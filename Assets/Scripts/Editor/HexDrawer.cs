@@ -12,24 +12,31 @@ public class HexDrawer : PropertyDrawer {
     {
         
         HexListWrapper hlw = (HexListWrapper)property.objectReferenceValue;
-
-        if (EditorGUI.ToggleLeft(new Rect(position.x + 50, position.y + 15, 45, 15), "Save", false))
+        string assetPath = "Assets/Prefabs/Pieces/AssetDB/" + property.serializedObject.targetObject.name.Replace("(Clone)", "");
+            
+        if (hlw == null)
         {
-            string assetPath = "Assets/Prefabs/Pieces/AssetDB/" + property.serializedObject.targetObject.name.Replace("(Clone)", "");
             hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
 
-            
             if (hlw == null)
             {
                 hlw = ObjectFactory.HexListWrapper();
                 AssetDatabase.CreateAsset(hlw, assetPath + "HexListWrappers.asset");
             }
+            property.objectReferenceValue = hlw;
+            return;
+        }
+
+        if (EditorGUI.ToggleLeft(new Rect(position.x + 50, position.y + 15, 45, 15), "Save", false))
+        {
 
             EditorUtility.SetDirty(hlw);
             AssetDatabase.SaveAssets();
 
             //((Piece)property.serializedObject.targetObject).LoadAsset();
             hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
+
+            return;
         }
 
         if (hlw == null || hlw.Hexes == null) { 
@@ -38,9 +45,8 @@ public class HexDrawer : PropertyDrawer {
             return;
         }
  
-        //need to display flipped image for some reason so orientation matches game
-        Layout layout = new Layout(Layout.pointy, new Point(10, -10), new Point(position.x, position.y + hlw.boardSize * 15));
-
+        Layout layout = new Layout(Layout.pointy, new Point(10, 10), new Point(0, 0));
+        Vector2 offset = new Vector2(position.x, position.y + 30);
 
         EditorGUI.LabelField(new Rect(position.x + 150, position.y, position.width - 50, 15), property.name);
         
@@ -53,7 +59,9 @@ public class HexDrawer : PropertyDrawer {
             {
                 Hex hex = OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, new OffsetCoord(col, row));
                 Point point = Layout.HexToPixel(layout, hex);
-                Rect pos = new Rect(new Vector2(point.x, point.y + 15), new Vector2(15, 15));
+
+                //need to display flipped image so orientation matches game
+                Rect pos = new Rect(new Vector2(offset.x + point.x, offset.y + (hlw.boardSize * 15) - (point.y + 15)), new Vector2(15, 15));
                 bool contains = hlw.Hexes.Contains(hex);
                 if (EditorGUI.Toggle(pos, contains))
                 {

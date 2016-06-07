@@ -68,7 +68,7 @@ public class CustomBoard : Board
         GameHex newHex;
         foreach (Hex hex in HexListWrapper.Hexes)
         {
-            OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
+            //OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
 
 
             newHex = ObjectFactory.GameHex(globalLayout);
@@ -96,13 +96,13 @@ public class CustomBoard : Board
         }
     }
 
-    public override bool InStartingArea(GameHex gHex, int playerIndex)
-    {
-        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
-        List<Hex> highlightHexes = playerIndex == 0 ? legalStartingHexesWrapperP1.Hexes : legalStartingHexesWrapperP2.Hexes;
+    //public override bool InStartingArea(GameHex gHex, int playerIndex)
+    //{
+    //    List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+    //    List<Hex> highlightHexes = playerIndex == 0 ? legalStartingHexesWrapperP1.Hexes : legalStartingHexesWrapperP2.Hexes;
        
-        return highlightGameHexes.Contains(gHex) || highlightHexes.Contains(gHex.hex);
-    }
+    //    return highlightGameHexes.Contains(gHex) || highlightHexes.Contains(gHex.hex);
+    //}
     public override bool InStartingArea(Hex hex, int playerIndex)
     {
         //this doesnt work because hex is in a differnet local layout
