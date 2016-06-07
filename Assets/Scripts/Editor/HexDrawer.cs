@@ -7,12 +7,15 @@ using UnityEditor;
 public class HexDrawer : PropertyDrawer {
 
     float height;
+    HexListWrapper hlw;
+    string assetPath;
+    SerializedProperty property;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        
-        HexListWrapper hlw = (HexListWrapper)property.objectReferenceValue;
-        string assetPath = "Assets/Prefabs/AssetDB/" + property.serializedObject.targetObject.name.Replace("(Clone)", "") + property.name + ".asset";
+        this.property = property;
+        hlw = (HexListWrapper)property.objectReferenceValue;
+        assetPath = "Assets/Prefabs/AssetDB/" + property.serializedObject.targetObject.name.Replace("(Clone)", "") + property.name + ".asset";
             
         if (hlw == null)
         {
@@ -28,22 +31,6 @@ public class HexDrawer : PropertyDrawer {
                 AssetDatabase.SaveAssets();
             }
             property.objectReferenceValue = hlw;
-            return;
-        }
-
-        if (EditorGUI.ToggleLeft(new Rect(position.x + 50, position.y + 15, 45, 15), "Save", false))
-        {
-            if (AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath) == null)
-            {
-                AssetDatabase.CreateAsset(hlw, assetPath);
-            }
-            property.objectReferenceValue = hlw;
-            EditorUtility.SetDirty(hlw);
-            AssetDatabase.SaveAssets();
-
-            //((Piece)property.serializedObject.targetObject).LoadAsset();
-            //hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath);
-
             return;
         }
 
@@ -74,14 +61,34 @@ public class HexDrawer : PropertyDrawer {
                 if (EditorGUI.Toggle(pos, contains))
                 {
                     if (!contains)
+                    {
                         hlw.Hexes.Add(hex);
+                        Save();
+                    }
+
                 }
                 else
+                {
                     hlw.Hexes.Remove(hex);
+                    if (contains)
+                        Save();
+                }
             }
         }
 
         height = hlw.boardSize * 15 + 15 + 15;
+    }
+
+    void Save()
+    {
+        if (AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath) == null)
+        {
+            AssetDatabase.CreateAsset(hlw, assetPath);
+        }
+        property.objectReferenceValue = hlw;
+        EditorUtility.SetDirty(hlw);
+        AssetDatabase.SaveAssets();
+
     }
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
