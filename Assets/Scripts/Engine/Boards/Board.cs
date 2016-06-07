@@ -6,13 +6,9 @@ using System.Collections;
 [ExecuteInEditMode]
 public abstract class Board : MonoBehaviour{
 
-    protected List<GameHex> gameHexes;
-    List<Hex> legalStartingHexesP1;
-    public virtual List<Hex> LegalStartingHexesP1
-    { get { return legalStartingHexesP1; } }
-    List<Hex> legalStartingHexesP2;
-    public virtual List<Hex> LegalStartingHexesP2
-    { get { return legalStartingHexesP2; } }
+    public virtual List<GameHex> Hexes { get; set; }
+    public virtual List<GameHex> LegalStartingHexesP1 { get; set; }
+    public virtual List<GameHex> LegalStartingHexesP2 { get; set; }
 
 
     protected UISignals UISignals;
@@ -22,9 +18,6 @@ public abstract class Board : MonoBehaviour{
     public Material outer;
     public Material highlight;
 
-    List<Hex> hexes;
-    public virtual List<Hex> Hexes
-    { get { return hexes; } }
 
 
     public virtual void InitBoard(Layout globalLayout, UISignals UISignals)
@@ -34,7 +27,7 @@ public abstract class Board : MonoBehaviour{
 
         BuildBoard();
 
-        foreach (GameHex gHex in gameHexes)
+        foreach (GameHex gHex in Hexes)
         {
             gHex.SetColourInner(inner);
             gHex.SetColourOuter(outer);
@@ -45,24 +38,48 @@ public abstract class Board : MonoBehaviour{
 
     internal bool InBounds(Hex hex)
     {
-        foreach (Hex legalHex in Hexes)
+        foreach (GameHex legalHex in Hexes)
         {
-            if (hex == legalHex)
+            if (hex == legalHex.hex)
                 return true;
         }
         return false;
     }
     
-    public void HighlightPlayer(int playerIndex)
+    public virtual void HighlightPlayer(int playerIndex)
     {
-        List<Hex> highlightHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
-        foreach (GameHex gHex in gameHexes)
+        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+        foreach (GameHex gHex in Hexes)
         {
-            if(highlightHexes.Contains(gHex.hex))
+            if(highlightGameHexes.Contains(gHex))
                 gHex.SetColourOuter(highlight);
             else
                 gHex.SetColourOuter(outer);
 
         }
+    }
+    public virtual bool InStartingArea(Piece piece, int playerIndex)
+    {
+        foreach(GameHex gHex in piece.Hexes)
+        {
+            if(InStartingArea(gHex, playerIndex))
+                return true;
+        }
+        return false;
+    }
+    public virtual bool InStartingArea(GameHex gHex, int playerIndex)
+    {
+        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+        return highlightGameHexes.Contains(gHex);
+    }
+    public virtual bool InStartingArea(Hex globalHex, int playerIndex)
+    {
+        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+        foreach (GameHex gHex in highlightGameHexes)
+        {
+            if (gHex.hex == globalHex)
+                return true;
+        }
+        return false;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class ObjectFactory : MonoBehaviour {
 
@@ -31,11 +32,11 @@ public class ObjectFactory : MonoBehaviour {
         return gHex;
     }
 
-    public static Piece Piece(Layout layout, Piece.Shape shape, Player owner, int startRotation)
+    public static Piece Piece(Piece piecePrefab, Layout layout, Player owner, int startRotation)
     {
-        Piece piece = Instantiate<Piece>(Instance.PiecePrefab);
-        piece.name = shape + " " + owner.Name;
-        piece.Init(layout, shape, startRotation);
+        Piece piece = Instantiate<Piece>(piecePrefab);
+        piece.name = piecePrefab.name + " " + owner.Name;
+        piece.Init(layout, startRotation);
         owner.pieces.Add(piece);
         return piece;
 
@@ -47,5 +48,14 @@ public class ObjectFactory : MonoBehaviour {
         board.InitBoard(globalLayout, Instance.UISignals);
 
         return board;
+    }
+
+    public static HexListWrapper HexListWrapper()
+    {
+        HexListWrapper HexListWrapper = ScriptableObject.CreateInstance<HexListWrapper>();
+        HexListWrapper.GameHexes = new List<GameHex>();
+        HexListWrapper.Hexes = new List<Hex>();
+
+        return HexListWrapper;
     }
 }

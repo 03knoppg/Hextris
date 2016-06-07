@@ -34,6 +34,8 @@ public class HexListWrapper : ScriptableObject
 {
     public int boardSize = 10;
     public List<Hex> Hexes;
+    [NonSerialized]
+    public List<GameHex> GameHexes;
 }
 
 [Serializable]

@@ -42,9 +42,8 @@ public class Game : MonoBehaviour {
 
     public float layoutSize = 1;
     public int numPlayers = 1;
-    public List<Piece.Shape> shapes = new List<Piece.Shape>()
-    {
-    };
+    public List<Piece> piecePrefabs;
+    public List<int> startingRotations;
 
 
 
@@ -233,7 +232,7 @@ public class Game : MonoBehaviour {
             totalPieces += player.pieces.Count;
 
         //have all the pieces been placed?
-        if (Mathf.FloorToInt(totalPieces / numPlayers) == shapes.Count)
+        if (Mathf.FloorToInt(totalPieces / numPlayers) == piecePrefabs.Count)
         {
             //start with player 0
             currentPlayerIndex = -1;
@@ -248,10 +247,10 @@ public class Game : MonoBehaviour {
             (numPlayers - 1) - totalPieces % numPlayers, 0, (numPlayers - 1));
 
         Piece piece = ObjectFactory.Piece(
-            layout, 
-            shapes[Mathf.FloorToInt(totalPieces / 2)], 
+            piecePrefabs[Mathf.FloorToInt(totalPieces / 2)], 
+            layout,
             players[currentPlayerIndex],
-            2);
+            startingRotations[Mathf.FloorToInt(totalPieces / 2)]);
         
         piece.OnPieceClicked += OnPieceClicked;
         piece.OuterInactive = OuterInactive;
@@ -325,9 +324,9 @@ public class Game : MonoBehaviour {
                     if (otherPiece == piece)
                         continue;
 
-                    foreach (GameHex otherHex in otherPiece.hexes)
+                    foreach (GameHex otherHex in otherPiece.Hexes)
                     {
-                        foreach (GameHex hex in piece.hexes)
+                        foreach (GameHex hex in piece.Hexes)
                         {
                             if (otherHex == hex)
                                 return false;
@@ -335,11 +334,11 @@ public class Game : MonoBehaviour {
                     }
                 }
             }
-            return IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.LegalStartingHexesP1 : currentBoard.LegalStartingHexesP2);
+            return currentBoard.InStartingArea(piece, currentPlayerIndex);
         }
         else if (currentPhase == GamePhase.Main)
         {
-            foreach (GameHex gHex in piece.hexes)
+            foreach (GameHex gHex in piece.Hexes)
             {
                 Hex hex = FractionalHex.HexRound(Layout.PixelToHex(layout,  gHex.GlobalPoint));
 
@@ -356,36 +355,36 @@ public class Game : MonoBehaviour {
     {
         foreach (Piece piece in players[currentPlayerIndex].pieces)
         {
-            if (!IsPieceInArea(piece, currentPlayerIndex == 0 ? currentBoard.LegalStartingHexesP2 : currentBoard.LegalStartingHexesP1))
+            if (!currentBoard.InStartingArea(piece, (currentPlayerIndex + 1) % 2))
                 return false;
         }
 
         return true;
     }
 
-    public bool IsPieceInArea(Piece piece, List<Hex> hexes)
-    {
-        bool touchingLegalArea = false;
-        foreach (GameHex gHex in piece.hexes)
-        {
-            Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(layout, gHex.GlobalPoint));
-            if (!currentBoard.InBounds(globalHex))
-                return false;
+    //public bool IsPieceInArea(Piece piece, List<GameHex> hexes)
+    //{
+    //    bool touchingLegalArea = false;
+    //    foreach (GameHex gHex in piece.Hexes)
+    //    {
+    //        Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(layout, gHex.GlobalPoint));
+    //        if (!currentBoard.InBounds(globalHex))
+    //            return false;
 
-            if (!touchingLegalArea)
-            {
-                foreach (Hex legalHex in hexes)
-                {
-                    if (globalHex.Equals(legalHex))
-                    {
-                        touchingLegalArea = true;
-                        break;
-                    }
-                }
-            }
-        }
-        return touchingLegalArea;
-    }
+    //        if (!touchingLegalArea)
+    //        {
+    //            foreach (GameHex legalHex in hexes)
+    //            {
+    //                if (globalHex.Equals(legalHex.hex))
+    //                {
+    //                    touchingLegalArea = true;
+    //                    break;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return touchingLegalArea;
+    //}
 
 
     internal void End()

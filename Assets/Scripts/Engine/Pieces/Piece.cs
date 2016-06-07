@@ -1,18 +1,27 @@
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 /*
  * The position of this game object is equal to the global position of the pivot hex.
  * Each other hex is calculated on local layout relative to pivot the hex.
  */
+[ExecuteInEditMode]
 public class Piece: MonoBehaviour
 {
 	public delegate void PieceClicked(Piece piece, GameHex hex);
 	public PieceClicked OnPieceClicked;
 
-	public List<GameHex> hexes = new List<GameHex>();
+	//public List<GameHex> hexes = new List<GameHex>();
 
+    [HexBuilder]
+    [SerializeField]
+    HexListWrapper HexListWrapper;
+
+    public List<GameHex> Hexes { get { return HexListWrapper.GameHexes; } }
+
+    public float mouseOffset;
 	
 	public int targetRotation = 0;
 	public int lastGoodRotation = 0;
@@ -23,35 +32,40 @@ public class Piece: MonoBehaviour
 	public float realRotationFloat = 0;
 	public bool colliding = false;
 
-	public Material OuterInactive;
-	public Material OuterPivot;
-	public Material OuterSelected;
-	public Material InnerActive;
+    [HideInInspector]
+    public Material OuterInactive;
+    [HideInInspector]
+    public Material OuterPivot;
+    [HideInInspector]
+    public Material OuterSelected;
+    [HideInInspector]
+    public Material InnerActive;
+    [HideInInspector]
 	public Material InnerDisabled;
 
 
-	public enum Shape
-	{
-		//L, //not yet implemented
-		//I, //not yet implemented
-		Two,
-		Triangle,
-		S,
-		C,
-Three,
-Four
-	};
+//    public enum Shape
+//    {
+//        //L, //not yet implemented
+//        //I, //not yet implemented
+//        Two,
+//        Triangle,
+//        S,
+//        C,
+//Three,
+//Four
+//    };
 
-	static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
-	{
-		//Axial coordinates?
-		{Shape.Two,         new int[2,2]{{0,0},{0,1}}},
-		{Shape.Three,       new int[3,2]{{0,0},{0,1},{-1,2}}},
-		{Shape.Four,        new int[4,2]{{0,0},{0,1},{-1,2},{-1,3}}},
-		{Shape.Triangle,    new int[4,2]{{0,0},{0,1},{1,0},{0,-1}}},
-		{Shape.S,           new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
-		{Shape.C,           new int[4,2]{{0,0},{0,1},{0,2},{1,2}}}
-	};
+//    static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
+//    {
+//        //Axial coordinates?
+//        {Shape.Two,         new int[2,2]{{0,0},{0,1}}},
+//        {Shape.Three,       new int[3,2]{{0,0},{0,1},{-1,2}}},
+//        {Shape.Four,        new int[4,2]{{0,0},{0,1},{-1,2},{-1,3}}},
+//        {Shape.Triangle,    new int[4,2]{{0,0},{0,1},{1,0},{0,-1}}},
+//        {Shape.S,           new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
+//        {Shape.C,           new int[4,2]{{0,0},{0,1},{0,2},{1,2}}}
+//    };
 
 	public enum EMode
 	{
@@ -82,7 +96,7 @@ Four
 					break;
 
 				case EMode.Selected:
-					foreach (GameHex ghex in hexes)
+                    foreach (GameHex ghex in Hexes)
 					{
 						//old pivot hex
 						if (ghex.IsPivotHex)
@@ -124,18 +138,43 @@ Four
 		set { transform.localPosition = new Vector3(value.x, 0.2f, value.y); }
 	}
 
-	public void Init(Layout layout, Shape shape, int startRotation)
+    public void Awake()
+    {
+        LoadAsset();
+    }
+
+    public void LoadAsset()
+    {
+        string assetPath = "Assets/Prefabs/Pieces/AssetDB/" + name.Replace("(Clone)", "");
+        HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
+
+        if (HexListWrapper == null)
+        {
+            Debug.LogError("HexListWrapper asset null");
+        }
+    }
+
+	public void Init(Layout layout, int startRotation)
 	{
         globalLayout = new Layout(layout.orientation, layout.size, new Point(0, 0)); 
         localLayout = new Layout(layout.orientation, layout.size, new Point(0, 0));
 
-		int[,] points = shapes[shape];
-		for (int i = 0; i < points.Length / 2; i++)
-		{
-			Hex hex = OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, new OffsetCoord(points[i, 0], points[i, 1]));
-			AddHex(hex);
-		}
-		foreach (GameHex gHex in hexes)
+
+        HexListWrapper.GameHexes = new List<GameHex>();
+        foreach (Hex hex in HexListWrapper.Hexes)
+        {
+            GameHex newGameHex = ObjectFactory.GameHex(globalLayout);
+
+            newGameHex.transform.parent = transform;
+            newGameHex.OnHexClicked += OnHexClicked;
+            newGameHex.OnHexMouseDown += OnHexMouseDown;
+            newGameHex.SetPosition(localLayout, hex);
+
+            Hexes.Add(newGameHex);
+            //if (Hexes.Count == 1)
+            //    SetPivotHex(newGameHex);
+        }
+        foreach (GameHex gHex in Hexes)
 		{
 			gHex.OnCollision += HexCollision;
 			gHex.OnCollisionExit += HexCollisionExit;
@@ -153,7 +192,7 @@ Four
 
 	private void FixCorners()
 	{
-		foreach (GameHex gHex in hexes)
+        foreach (GameHex gHex in Hexes)
 		{
 			foreach (MeshRenderer corner in gHex.corners)
 				corner.gameObject.SetActive(false);
@@ -161,7 +200,7 @@ Four
 			for (int direction = 0; direction < 6; direction++)
 			{
 				Hex neighbour = Hex.Neighbor(gHex.hex, direction);
-				foreach (GameHex gHex2 in hexes)
+				foreach (GameHex gHex2 in Hexes)
 				{
 					if (gHex2.hex == neighbour)
 					{
@@ -191,33 +230,25 @@ Four
 
 	void Update()
 	{
-		if (mode == EMode.Selected && Input.GetMouseButton(0) && !colliding)
+		if (mode == EMode.Selected && !colliding)
 		{
-			Vector3 mouseOffset = Input.mousePosition - UnityEngine.Camera.main.WorldToScreenPoint(transform.position);
-			float pointerDistance = mouseOffset.magnitude;
-			if (pointerDistance > 50)
-			{
-				float mouseAngle = Mathf.Atan2(mouseOffset.x, mouseOffset.y);
-				float rotationDelta = mouseAngle - oldRotateAngle;
-				if (oldRotateAngle != 100 && Mathf.Abs(rotationDelta) < 1)
-				{
-					//Debug.Log(rotationDelta);
-					rotationFloat += rotationDelta;
-					if (Mathf.Abs(rotationFloat) > Mathf.PI / 3)
-					{
-						if (rotationFloat > 0)
-							targetRotation++;
-						else if (rotationFloat < 0)
-							targetRotation--;
+            if (Input.GetMouseButtonDown(0))
+                mouseOffset = Input.mousePosition.x;
 
-						rotationFloat = 0;
-					}
-				}
-				oldRotateAngle = mouseAngle;
-			}
-			else
-				oldRotateAngle = 100;
-			//Debug.Log(mouseOffset);
+            else if (Input.GetMouseButton(0))
+            {
+                rotationFloat += (Input.mousePosition.x - mouseOffset) / 100;
+                if (Mathf.Abs(rotationFloat) > Mathf.PI / 3)
+                {
+                    if (rotationFloat > 0)
+                        targetRotation++;
+                    else if (rotationFloat < 0)
+                        targetRotation--;
+
+                    rotationFloat = 0;
+                }
+                mouseOffset = Input.mousePosition.x;
+            }
 		}
 	   
 		
@@ -244,7 +275,7 @@ Four
 
 	public void LockRotation()
 	{
-		foreach (GameHex gHex in hexes)
+        foreach (GameHex gHex in Hexes)
 		{
 			gHex.Rotate(targetRotation);
 			gHex.UpdatePosition(localLayout);
@@ -265,19 +296,6 @@ Four
 		transform.rotation = Quaternion.identity;
 	}
 
-	public void AddHex(Hex hex)
-	{
-		GameHex newGameHex = ObjectFactory.GameHex(globalLayout);
-
-		newGameHex.transform.parent = transform;
-		newGameHex.OnHexClicked += OnHexClicked;
-		newGameHex.OnHexMouseDown += OnHexMouseDown;
-		newGameHex.SetPosition(localLayout, hex);
-
-		hexes.Add(newGameHex);
-		if (hexes.Count == 1)
-			SetPivotHex(newGameHex);
-	}
 
 	private void OnHexMouseDown(GameHex gameHex)
 	{
@@ -303,7 +321,7 @@ Four
 		transform.position = pivotHex.transform.position;
 		Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
 
-		foreach(GameHex gameHex in hexes)
+        foreach (GameHex gameHex in Hexes)
 		{
 			gameHex.UpdateLayout(localLayout, newLocalLayout);
 			pivotHex.SetColourOuter(OuterSelected);
@@ -327,14 +345,14 @@ Four
 
 	void SetColourInner(Material mat)
 	{
-		foreach (GameHex gHex in hexes)
+        foreach (GameHex gHex in Hexes)
 		{
 			gHex.SetColourInner(mat);
 		}
 	}
 	void SetColourOuter(Material mat)
 	{
-		foreach (GameHex gHex in hexes)
+        foreach (GameHex gHex in Hexes)
 		{
 			gHex.SetColourOuter(mat);
 		}
