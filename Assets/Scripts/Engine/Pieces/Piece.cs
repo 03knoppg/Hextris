@@ -142,19 +142,15 @@ public class Piece: MonoBehaviour
 
     public void Awake()
     {
-        LoadAsset();
-    }
-
-    public void LoadAsset()
-    {
-        string assetPath = "Assets/Prefabs/Pieces/AssetDB/" + name.Replace("(Clone)", "");
-        HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
+        string assetPath = "Assets/Prefabs/AssetDB/" + name.Replace("(Clone)", "");
+        HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrapper.asset");
 
         if (HexListWrapper == null)
         {
             Debug.LogError("HexListWrapper asset null");
         }
     }
+
 
 	public void Init(Layout layout, int startRotation)
 	{

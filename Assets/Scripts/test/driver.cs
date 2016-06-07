@@ -12,6 +12,7 @@ public class Driver : MonoBehaviour
     UIStates UIState;
 
     Game currentGame;
+    int currentGameIndex;
 
     void Awake()
     {
@@ -44,8 +45,8 @@ public class Driver : MonoBehaviour
                 if (currentGame != null)
                     currentGame.End();
 
-                int index = (int)arg1;
-                currentGame = ObjectFactory.Game(GamePrefabs[index]);
+                currentGameIndex = (int)(arg1 ?? ++currentGameIndex);
+                currentGame = ObjectFactory.Game(GamePrefabs[currentGameIndex]);
                 break;
             case UISignal.ShowBoardSelect:
                 UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);

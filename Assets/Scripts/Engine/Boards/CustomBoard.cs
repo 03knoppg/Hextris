@@ -36,25 +36,25 @@ public class CustomBoard : Board
 
     void Awake()
     {
-        string assetPath = "Assets/Prefabs/Boards/AssetDB/" + name.Replace("(Clone)", "");
-        legalStartingHexesWrapperP2 = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappersP2.asset");
-        legalStartingHexesWrapperP1 = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappersP1.asset");
-        HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
+        string assetPath = "Assets/Prefabs/AssetDB/" + name.Replace("(Clone)", "");
+        legalStartingHexesWrapperP2 = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "legalStartingHexesWrapperP2.asset");
+        legalStartingHexesWrapperP1 = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "legalStartingHexesWrapperP1.asset");
+        HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrapper.asset");
 
         if (legalStartingHexesWrapperP2 == null)
         {
             legalStartingHexesWrapperP2 = ObjectFactory.HexListWrapper();
-            AssetDatabase.CreateAsset(legalStartingHexesWrapperP2, assetPath + "HexListWrappersP2.asset");
+            AssetDatabase.CreateAsset(legalStartingHexesWrapperP2, assetPath + "legalStartingHexesWrapperP2.asset");
         }
         if (legalStartingHexesWrapperP1 == null)
         {
             legalStartingHexesWrapperP1 = ObjectFactory.HexListWrapper();
-            AssetDatabase.CreateAsset(legalStartingHexesWrapperP1, assetPath + "HexListWrappersP1.asset");
+            AssetDatabase.CreateAsset(legalStartingHexesWrapperP1, assetPath + "legalStartingHexesWrapperP1.asset");
         }
         if (HexListWrapper == null)
         {
             HexListWrapper = ObjectFactory.HexListWrapper();
-            AssetDatabase.CreateAsset(HexListWrapper, assetPath + "HexListWrappers.asset");
+            AssetDatabase.CreateAsset(HexListWrapper, assetPath + "HexListWrapper.asset");
         }
 
         EditorUtility.SetDirty(this);

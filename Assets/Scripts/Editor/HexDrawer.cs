@@ -12,16 +12,20 @@ public class HexDrawer : PropertyDrawer {
     {
         
         HexListWrapper hlw = (HexListWrapper)property.objectReferenceValue;
-        string assetPath = "Assets/Prefabs/Pieces/AssetDB/" + property.serializedObject.targetObject.name.Replace("(Clone)", "");
+        string assetPath = "Assets/Prefabs/AssetDB/" + property.serializedObject.targetObject.name.Replace("(Clone)", "") + property.name + ".asset";
             
         if (hlw == null)
         {
-            hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
+            hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath);
 
             if (hlw == null)
             {
                 hlw = ObjectFactory.HexListWrapper();
-                AssetDatabase.CreateAsset(hlw, assetPath + "HexListWrappers.asset");
+                property.objectReferenceValue = hlw;
+                AssetDatabase.CreateAsset(hlw, assetPath);
+
+                EditorUtility.SetDirty(hlw);
+                AssetDatabase.SaveAssets();
             }
             property.objectReferenceValue = hlw;
             return;
@@ -29,12 +33,16 @@ public class HexDrawer : PropertyDrawer {
 
         if (EditorGUI.ToggleLeft(new Rect(position.x + 50, position.y + 15, 45, 15), "Save", false))
         {
-
+            if (AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath) == null)
+            {
+                AssetDatabase.CreateAsset(hlw, assetPath);
+            }
+            property.objectReferenceValue = hlw;
             EditorUtility.SetDirty(hlw);
             AssetDatabase.SaveAssets();
 
             //((Piece)property.serializedObject.targetObject).LoadAsset();
-            hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrappers.asset");
+            //hlw = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath);
 
             return;
         }
