@@ -60,7 +60,7 @@ public abstract class Board : MonoBehaviour{
     }
     public virtual bool InStartingArea(Piece piece, int playerIndex)
     {
-        foreach(GameHex gHex in piece.Hexes)
+        foreach(GameHex gHex in piece.GameHexes)
         {
             Hex tempHex = FractionalHex.HexRound(Layout.PixelToHex(globalLayout, gHex.GlobalPoint));
             if (InStartingArea(tempHex, playerIndex))

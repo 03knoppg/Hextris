@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEditor;
 using UnityEngine;
 
-
+[SelectionBase]
 public class GameHex : MonoBehaviour
 {
     [SerializeField]
+    public OffsetCoord coord;
+
     //public?
     public Hex hex;
     public static Layout GolbalLayout;
@@ -49,12 +52,7 @@ public class GameHex : MonoBehaviour
             return new Point(transform.position.x, transform.position.z);
         }
     }
-
-    void Awake()
-    {
-        hex = new Hex();
-    }
-
+    
     void Update()
     {
         OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
@@ -93,6 +91,11 @@ public class GameHex : MonoBehaviour
         hex = FractionalHex.HexRound(Layout.PixelToHex(newLayout, Layout.HexToPixel(oldLayout, hex)));
         //UpdatePosition(newLayout);
         UpdatePosition(oldLayout);
+    }
+
+    public void UpdatePosition()
+    {
+        UpdatePosition(new Layout(Layout.pointy, new Point(1, 1), new Point(0, 0)));
     }
 
     public void UpdatePosition(Layout localLayout)

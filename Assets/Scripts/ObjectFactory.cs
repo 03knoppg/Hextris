@@ -10,8 +10,6 @@ public class ObjectFactory : MonoBehaviour {
     [SerializeField]
     UISignals UISignals;
     [SerializeField]
-    Piece PiecePrefab;
-    [SerializeField]
     GameHex GameHexPrefab;
 
 	// Use this for initialization
@@ -48,14 +46,5 @@ public class ObjectFactory : MonoBehaviour {
         board.InitBoard(globalLayout, Instance.UISignals);
 
         return board;
-    }
-
-    public static HexListWrapper HexListWrapper()
-    {
-        HexListWrapper HexListWrapper = ScriptableObject.CreateInstance<HexListWrapper>();
-        HexListWrapper.GameHexes = new List<GameHex>();
-        HexListWrapper.Hexes = new List<Hex>();
-
-        return HexListWrapper;
     }
 }

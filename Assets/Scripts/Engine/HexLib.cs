@@ -30,15 +30,6 @@ public struct Point
 }
 
 [Serializable]
-public class HexListWrapper : ScriptableObject
-{
-    public int boardSize = 10;
-    public List<Hex> Hexes;
-    [NonSerialized]
-    public List<GameHex> GameHexes;
-}
-
-[Serializable]
 public struct Hex
 {
     public Hex(int q, int r, int s)
@@ -47,7 +38,6 @@ public struct Hex
         this.r = r;
         this.s = s;
     }
-    [SerializeField]
     public int q;
     public int r;
     public int s;
@@ -179,6 +169,7 @@ public struct FractionalHex
 
 }
 
+[Serializable]
 public struct OffsetCoord
 {
     public OffsetCoord(int col, int row)
@@ -186,8 +177,8 @@ public struct OffsetCoord
         this.col = col;
         this.row = row;
     }
-    public readonly int col;
-    public readonly int row;
+    public int col;
+    public int row;
     static public int EVEN = 1;
     static public int ODD = -1;
 

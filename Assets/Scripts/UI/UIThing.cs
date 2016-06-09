@@ -38,15 +38,15 @@ public class UIThing : MonoBehaviour {
         switch (newState)
         {
             case UIStates.State.Active:
-                gameObject.SetActive(true);
+                //gameObject.SetActive(true);
                 animator.SetTrigger("Active");
                 break;
             case UIStates.State.Disabled:
-                gameObject.SetActive(true);
+                //gameObject.SetActive(true);
                 animator.SetTrigger("Disabled");
                 break;
             case UIStates.State.Hidden:
-                gameObject.SetActive(false);
+                //gameObject.SetActive(false);
                 animator.SetTrigger("Hidden");
                 break;
         }

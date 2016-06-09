@@ -123,16 +123,21 @@ public class Game : MonoBehaviour {
         if (OnGamePhaseChange != null)
             OnGamePhaseChange(currentPhase);
 
-        if (newPhase == GamePhase.Setup)
+        switch(newPhase)
         {
-            UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Hidden);
-            UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
-            UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Hidden);
-        }
-        if (newPhase == GamePhase.End)
-        {
-            UISignals.Click(global::UISignal.PlayerWin, currentPlayerIndex);
-            UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
+
+            case GamePhase.Setup:
+                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Hidden);
+                UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
+                UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Hidden);
+            break;
+            case GamePhase.Main:
+                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
+                break;
+            case GamePhase.End:
+                UISignals.Click(global::UISignal.PlayerWin, currentPlayerIndex);
+                UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
+            break;
         }
     }
 
@@ -162,10 +167,10 @@ public class Game : MonoBehaviour {
 
             bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation != 0;
 
-            if (anyTurning || currentSelectedPiece == null)
-                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
-            else
-                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
+            //if (anyTurning || currentSelectedPiece == null)
+            //    UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
+            //else
+            //    UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
 
 
             if (allLegal && !anyTurning && hasTurned)
@@ -236,7 +241,7 @@ public class Game : MonoBehaviour {
         {
             //start with player 0
             currentPlayerIndex = -1;
-            currentPhase = GamePhase.Main;
+            SetPhase(GamePhase.Main);
             NextPlayer();
             return;
         }
@@ -324,9 +329,9 @@ public class Game : MonoBehaviour {
                     if (otherPiece == piece)
                         continue;
 
-                    foreach (GameHex otherHex in otherPiece.Hexes)
+                    foreach (GameHex otherHex in otherPiece.GameHexes)
                     {
-                        foreach (GameHex hex in piece.Hexes)
+                        foreach (GameHex hex in piece.GameHexes)
                         {
                             if (otherHex == hex)
                                 return false;
@@ -338,7 +343,7 @@ public class Game : MonoBehaviour {
         }
         else if (currentPhase == GamePhase.Main)
         {
-            foreach (GameHex gHex in piece.Hexes)
+            foreach (GameHex gHex in piece.GameHexes)
             {
                 Hex hex = FractionalHex.HexRound(Layout.PixelToHex(layout,  gHex.GlobalPoint));
 

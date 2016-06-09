@@ -7,19 +7,13 @@ using UnityEngine;
  * The position of this game object is equal to the global position of the pivot hex.
  * Each other hex is calculated on local layout relative to pivot the hex.
  */
-[ExecuteInEditMode]
+
 public class Piece: MonoBehaviour
 {
 	public delegate void PieceClicked(Piece piece, GameHex hex);
 	public PieceClicked OnPieceClicked;
 
-	//public List<GameHex> hexes = new List<GameHex>();
-
-    [HexBuilder]
-    [SerializeField]
-    HexListWrapper HexListWrapper;
-
-    public List<GameHex> Hexes { get { return HexListWrapper.GameHexes; } }
+    public List<GameHex> GameHexes;
 
     public float mouseOffset;
 	
@@ -44,28 +38,6 @@ public class Piece: MonoBehaviour
 	public Material InnerDisabled;
 
 
-//    public enum Shape
-//    {
-//        //L, //not yet implemented
-//        //I, //not yet implemented
-//        Two,
-//        Triangle,
-//        S,
-//        C,
-//Three,
-//Four
-//    };
-
-//    static Dictionary<Shape, int[,]> shapes = new Dictionary<Shape, int[,]>()
-//    {
-//        //Axial coordinates?
-//        {Shape.Two,         new int[2,2]{{0,0},{0,1}}},
-//        {Shape.Three,       new int[3,2]{{0,0},{0,1},{-1,2}}},
-//        {Shape.Four,        new int[4,2]{{0,0},{0,1},{-1,2},{-1,3}}},
-//        {Shape.Triangle,    new int[4,2]{{0,0},{0,1},{1,0},{0,-1}}},
-//        {Shape.S,           new int[4,2]{{0,0},{0,-1},{0,-2},{0,-3}}},
-//        {Shape.C,           new int[4,2]{{0,0},{0,1},{0,2},{1,2}}}
-//    };
 
 	public enum EMode
 	{
@@ -96,7 +68,7 @@ public class Piece: MonoBehaviour
 					break;
 
 				case EMode.Selected:
-                    foreach (GameHex ghex in Hexes)
+                    foreach (GameHex ghex in GameHexes)
 					{
 						//old pivot hex
 						if (ghex.IsPivotHex)
@@ -142,13 +114,13 @@ public class Piece: MonoBehaviour
 
     public void Awake()
     {
-        string assetPath = "Assets/Prefabs/AssetDB/" + name.Replace("(Clone)", "");
-        HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrapper.asset");
+        //string assetPath = "Assets/Prefabs/AssetDB/" + name.Replace("(Clone)", "");
+        //HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrapper.asset");
 
-        if (HexListWrapper == null)
-        {
-            Debug.LogError("HexListWrapper asset null");
-        }
+        //if (HexListWrapper == null)
+        //{
+        //    Debug.LogError("HexListWrapper asset null");
+        //}
     }
 
 
@@ -157,23 +129,11 @@ public class Piece: MonoBehaviour
         globalLayout = new Layout(layout.orientation, layout.size, new Point(0, 0)); 
         localLayout = new Layout(layout.orientation, layout.size, new Point(0, 0));
 
-
-        HexListWrapper.GameHexes = new List<GameHex>();
-        foreach (Hex hex in HexListWrapper.Hexes)
+        GameHexes = new List<GameHex>(GetComponentsInChildren<GameHex>());
+        foreach (GameHex gHex in GameHexes)
         {
-            GameHex newGameHex = ObjectFactory.GameHex(globalLayout);
-
-            newGameHex.transform.parent = transform;
-            newGameHex.OnHexClicked += OnHexClicked;
-            newGameHex.OnHexMouseDown += OnHexMouseDown;
-            newGameHex.SetPosition(localLayout, hex);
-
-            Hexes.Add(newGameHex);
-            //if (Hexes.Count == 1)
-            //    SetPivotHex(newGameHex);
-        }
-        foreach (GameHex gHex in Hexes)
-		{
+            gHex.OnHexClicked += OnHexClicked;
+            gHex.OnHexMouseDown += OnHexMouseDown;
 			gHex.OnCollision += HexCollision;
 			gHex.OnCollisionExit += HexCollisionExit;
 		}
@@ -190,7 +150,7 @@ public class Piece: MonoBehaviour
 
 	private void FixCorners()
 	{
-        foreach (GameHex gHex in Hexes)
+        foreach (GameHex gHex in GameHexes)
 		{
 			foreach (MeshRenderer corner in gHex.corners)
 				corner.gameObject.SetActive(false);
@@ -198,7 +158,7 @@ public class Piece: MonoBehaviour
 			for (int direction = 0; direction < 6; direction++)
 			{
 				Hex neighbour = Hex.Neighbor(gHex.hex, direction);
-				foreach (GameHex gHex2 in Hexes)
+				foreach (GameHex gHex2 in GameHexes)
 				{
 					if (gHex2.hex == neighbour)
 					{
@@ -273,7 +233,7 @@ public class Piece: MonoBehaviour
 
 	public void LockRotation()
 	{
-        foreach (GameHex gHex in Hexes)
+        foreach (GameHex gHex in GameHexes)
 		{
 			gHex.Rotate(targetRotation);
 			gHex.UpdatePosition(localLayout);
@@ -319,7 +279,7 @@ public class Piece: MonoBehaviour
 		transform.position = pivotHex.transform.position;
 		Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
 
-        foreach (GameHex gameHex in Hexes)
+        foreach (GameHex gameHex in GameHexes)
 		{
 			gameHex.UpdateLayout(localLayout, newLocalLayout);
 			pivotHex.SetColourOuter(OuterSelected);
@@ -343,14 +303,14 @@ public class Piece: MonoBehaviour
 
 	void SetColourInner(Material mat)
 	{
-        foreach (GameHex gHex in Hexes)
+        foreach (GameHex gHex in GameHexes)
 		{
 			gHex.SetColourInner(mat);
 		}
 	}
 	void SetColourOuter(Material mat)
 	{
-        foreach (GameHex gHex in Hexes)
+        foreach (GameHex gHex in GameHexes)
 		{
 			gHex.SetColourOuter(mat);
 		}

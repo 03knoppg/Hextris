@@ -34,7 +34,11 @@ public class Driver : MonoBehaviour
 
     void LevelSelect()
     {
-        UISignals.Click(UISignal.ShowBoardSelect);
+        if (GamePrefabs.Count > 1)
+            UISignals.Click(UISignal.ShowBoardSelect);
+        else
+            StartGame(0);
+
     }
 
     private void OnUISignal(UISignal signal, object arg1)
@@ -42,20 +46,26 @@ public class Driver : MonoBehaviour
         switch (signal)
         {
             case UISignal.SelectBoard:
-                if (currentGame != null)
-                    currentGame.End();
-
                 currentGameIndex = (int)(arg1 ?? ++currentGameIndex);
-                currentGame = ObjectFactory.Game(GamePrefabs[currentGameIndex]);
+                StartGame(currentGameIndex);
                 break;
             case UISignal.ShowBoardSelect:
                 UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
+                UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Hidden);
                 UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Active);
                 break;
             case UISignal.Quit:
                 SceneManager.LoadScene("TitleScreen");
                 break;
         }
+    }
+
+    private void StartGame(int index)
+    {
+        if (currentGame != null)
+            currentGame.End();
+
+        currentGame = ObjectFactory.Game(GamePrefabs[currentGameIndex]);
     }
 
 }
