@@ -55,6 +55,7 @@ public class Game : MonoBehaviour {
     UIStates UIState;
 
 
+    public Vector3 CamPosition;
     public float layoutSize = 1;
     public int numPlayers = 1;
 
@@ -101,6 +102,8 @@ public class Game : MonoBehaviour {
         SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
 
+        UISignals.Click(UISignal.CamPosition, CamPosition); 
+
     }
 
     public void OnUISignal(UISignal signal, object arg1)
@@ -145,8 +148,13 @@ public class Game : MonoBehaviour {
                 UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
                 break;
             case GamePhase.End:
-                UISignals.Click(global::UISignal.PlayerWin, currentPlayerIndex);
+                UISignals.Click(UISignal.PlayerWin, currentPlayerIndex);
                 UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
+                UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
+                foreach (Player player in players)
+                {
+                    player.SetActivePlayer(false);
+                }
             break;
         }
     }
@@ -175,13 +183,16 @@ public class Game : MonoBehaviour {
                 allLegal &= IsValidPosition(piece);
             }
 
-            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation % 6 == 0;
+            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation % 6 != 0;
 
             //if (anyTurning || currentSelectedPiece == null)
             //    UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
             //else
             //    UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
-
+            if (lastSelectedPiece != null || hasTurned)
+                UIState.SetGroupState(UIStates.Group.Undo, UIStates.State.Active);
+            else
+                UIState.SetGroupState(UIStates.Group.Undo, UIStates.State.Disabled);
 
             if (allLegal && !anyTurning && hasTurned)
                 UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Active);

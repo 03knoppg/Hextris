@@ -16,7 +16,8 @@ public enum UISignal
     Quit,
     PlayerTurn,
     PlayerWin,
-    Restart
+    Restart,
+    CamPosition
 };
 
 public class UISignals : MonoBehaviour

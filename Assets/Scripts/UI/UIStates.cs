@@ -18,6 +18,7 @@ public class UIStates : MonoBehaviour {
     {
         None,
         PieceControls,
+        Undo,
         EndTurn,
         EndGame,
         PuzzleSelection

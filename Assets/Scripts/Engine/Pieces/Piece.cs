@@ -116,7 +116,7 @@ public class Piece: MonoBehaviour
 	{
 		//get { return new Point(transform.position.x, transform.position.z); }
 		set {
-            transform.localPosition = new Vector3(value.x, 0.2f, value.y);
+            transform.localPosition = new Vector3(value.x, 0.5f, value.y);
         }
 	}
 

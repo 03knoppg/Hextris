@@ -21,7 +21,10 @@ public class Player {
     {
         foreach (Piece p in pieces)
         {
-            p.Mode = Piece.EMode.Active;
+            if (active)
+                p.Mode = Piece.EMode.Active;
+            else
+                p.Mode = Piece.EMode.Disabled;
         }
     }
 
