@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.Events;
 
 /*
  * The position of this game object is equal to the global position of the pivot hex.
@@ -10,12 +10,18 @@ using UnityEngine;
 
 public class Piece: MonoBehaviour
 {
-	public delegate void PieceClicked(Piece piece, GameHex hex);
-	public PieceClicked OnPieceClicked;
+
+    public class MovementFinished : UnityEvent { };
+    public MovementFinished OnMovementFinished;
+    public class PieceClicked : UnityEvent<Piece, GameHex> { };
+    public PieceClicked OnPieceClicked;
+
 
     public List<GameHex> GameHexes;
 
     public float mouseOffset;
+
+    public int previousRotation = 0;
 	
 	public int targetRotation = 0;
 	public int lastGoodRotation = 0;
@@ -80,11 +86,13 @@ public class Piece: MonoBehaviour
 					}
 					break;
 
-				case EMode.Active:
+                case EMode.Active:
+                    SetColourInner(InnerActive);
 					SetColourOuter(OuterSelected);
 					break;
 
-				case EMode.Inactive:
+                case EMode.Inactive:
+                    SetColourInner(InnerActive);
 					SetColourOuter(OuterInactive);
 					break;
 
@@ -112,20 +120,14 @@ public class Piece: MonoBehaviour
         }
 	}
 
-    public void Awake()
-    {
-        //string assetPath = "Assets/Prefabs/AssetDB/" + name.Replace("(Clone)", "");
-        //HexListWrapper = AssetDatabase.LoadAssetAtPath<HexListWrapper>(assetPath + "HexListWrapper.asset");
-
-        //if (HexListWrapper == null)
-        //{
-        //    Debug.LogError("HexListWrapper asset null");
-        //}
-    }
 
 
-	public void Init(Layout layout, int startRotation)
+	public void Init(Layout layout, int startRotation, OffsetCoord? startPosition = null)
 	{
+
+        OnMovementFinished = new MovementFinished();
+        OnPieceClicked = new PieceClicked();
+
         globalLayout = new Layout(layout.orientation, layout.size, new Point(0, 0)); 
         localLayout = new Layout(layout.orientation, layout.size, new Point(0, 0));
 
@@ -145,6 +147,8 @@ public class Piece: MonoBehaviour
 
         targetRotation = startRotation;
         LockRotation();
+
+        Point = Layout.HexToPixel(globalLayout, OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, startPosition.GetValueOrDefault()));
 	}
 
 
@@ -220,6 +224,7 @@ public class Piece: MonoBehaviour
 		{
 			transform.rotation = Quaternion.Euler(0, targetRotation * 60, 0);
 			rotationRate = 0;
+            OnMovementFinished.Invoke();
 		}
 
 		if (realRotationFloat - lastGoodRotation * 60 > 60)
@@ -233,6 +238,7 @@ public class Piece: MonoBehaviour
 
 	public void LockRotation()
 	{
+        previousRotation = targetRotation;
         foreach (GameHex gHex in GameHexes)
 		{
 			gHex.Rotate(targetRotation);
@@ -254,13 +260,18 @@ public class Piece: MonoBehaviour
 		transform.rotation = Quaternion.identity;
 	}
 
+    public void UndoRotation()
+    {
+        targetRotation = -previousRotation;
+        LockRotation();
+        previousRotation = 0;
+    }
 
 	private void OnHexMouseDown(GameHex gameHex)
 	{
 		if (rotationRate == 0 && mode == EMode.Active)
 		{
-			if (OnPieceClicked != null)
-				OnPieceClicked(this, gameHex);
+			OnPieceClicked.Invoke(this, gameHex);
 		}
 	}
 
@@ -268,8 +279,7 @@ public class Piece: MonoBehaviour
 	{
 		if (rotationRate == 0 && mode != EMode.Inactive)
 		{
-			if (OnPieceClicked != null)
-				OnPieceClicked(this, gameHex);
+			OnPieceClicked.Invoke(this, gameHex);
 		}
 	}
 
@@ -291,13 +301,11 @@ public class Piece: MonoBehaviour
 	public void RotateCCW()
 	{
 		if (rotationRate == 0)
-			//rotation = (rotation + 5) % 6;
 			targetRotation--;
 	}
 	public void RotateCW()
 	{
 		if (rotationRate == 0)
-			//rotation = (rotation + 1) % 6;
 			targetRotation++;
 	}
 

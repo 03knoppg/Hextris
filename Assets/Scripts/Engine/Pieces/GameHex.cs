@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 
-[SelectionBase]
+[SelectionBase, Serializable] 
 public class GameHex : MonoBehaviour
 {
     [SerializeField]
@@ -142,6 +141,16 @@ public class GameHex : MonoBehaviour
     public static bool operator !=(GameHex a, GameHex b)
     {
         return !(a == b);
+    }
+
+    public override bool Equals(object o)
+    {
+        return base.Equals(o);
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
     }
 
     internal void SetColourInner(Material mat)

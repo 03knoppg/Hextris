@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Collections;
 
 				
-[ExecuteInEditMode]
 public abstract class Board : MonoBehaviour{
 
-    public virtual List<GameHex> Hexes { get; set; }
-    public virtual List<GameHex> LegalStartingHexesP1 { get; set; }
-    public virtual List<GameHex> LegalStartingHexesP2 { get; set; }
+    [HideInInspector]
+    public List<GameHex> Hexes;
 
-
+    public List<GameHex> LegalStartingHexesP1;
+    public List<GameHex> LegalStartingHexesP2;
+    
     protected UISignals UISignals;
     protected Layout globalLayout;
 
     public Material inner;
     public Material outer;
-    public Material highlight;
+    public Material highlight; 
 
 
 

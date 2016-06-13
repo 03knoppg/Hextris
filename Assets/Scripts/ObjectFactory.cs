@@ -30,11 +30,11 @@ public class ObjectFactory : MonoBehaviour {
         return gHex;
     }
 
-    public static Piece Piece(Piece piecePrefab, Layout layout, Player owner, int startRotation)
+    public static Piece Piece(Piece piecePrefab, Layout layout, Player owner, int startRotation, OffsetCoord? startPosition = null)
     {
         Piece piece = Instantiate<Piece>(piecePrefab);
         piece.name = piecePrefab.name + " " + owner.Name;
-        piece.Init(layout, startRotation);
+        piece.Init(layout, startRotation, startPosition);
         owner.pieces.Add(piece);
         return piece;
 

@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.Events;
+using System;
+
 
 public class Game : MonoBehaviour {
 
@@ -21,13 +23,26 @@ public class Game : MonoBehaviour {
         Setup,
         Main,
         End
-    } 
+    }
+
+
+    [Serializable]
+    struct StartStruct
+    {
+        public Piece piece;
+        public int startRotation;
+        public bool useStartPosition;
+        public OffsetCoord startPosition;
+    }
+    [SerializeField]
+    List<StartStruct> StartStructs;
 
     List<Player> players;
     int currentPlayerIndex = 0;
 
     Board currentBoard;
     GamePhase currentPhase;
+    Piece lastSelectedPiece;
     Piece currentSelectedPiece;
 
     [SerializeField]
@@ -42,8 +57,6 @@ public class Game : MonoBehaviour {
 
     public float layoutSize = 1;
     public int numPlayers = 1;
-    public List<Piece> piecePrefabs;
-    public List<int> startingRotations;
 
 
 
@@ -67,7 +80,7 @@ public class Game : MonoBehaviour {
             UISignal.RotateCCW, 
             UISignal.RotateUndo, 
             UISignal.RotateCW, 
-            UISignal.EndTurn });
+            UISignal.EndTurn});
 
         players = new List<Player>();
         for (int i = 0; i < numPlayers; i++)
@@ -95,13 +108,7 @@ public class Game : MonoBehaviour {
         switch (signal)
         {
             case UISignal.EndTurn:
-                if (IsPlayerWin())
-                {
-                    SetPhase(GamePhase.End);
-                    return;
-                }
-                else
-                    NextPlayer();
+                OnMovementFinished();
                 break;
             case UISignal.RotateCCW:
                 currentSelectedPiece.RotateCCW();
@@ -110,7 +117,10 @@ public class Game : MonoBehaviour {
                 currentSelectedPiece.RotateCW();
                 break;
             case UISignal.RotateUndo:
-                currentSelectedPiece.ResetRotation();
+                if (lastSelectedPiece != null)
+                    lastSelectedPiece.UndoRotation();
+                else
+                    currentSelectedPiece.ResetRotation();
                 break;
 
         }
@@ -165,7 +175,7 @@ public class Game : MonoBehaviour {
                 allLegal &= IsValidPosition(piece);
             }
 
-            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation != 0;
+            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation % 6 == 0;
 
             //if (anyTurning || currentSelectedPiece == null)
             //    UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
@@ -237,7 +247,7 @@ public class Game : MonoBehaviour {
             totalPieces += player.pieces.Count;
 
         //have all the pieces been placed?
-        if (Mathf.FloorToInt(totalPieces / numPlayers) == piecePrefabs.Count)
+        if (Mathf.FloorToInt(totalPieces / numPlayers) == StartStructs.Count)
         {
             //start with player 0
             currentPlayerIndex = -1;
@@ -251,24 +261,63 @@ public class Game : MonoBehaviour {
             totalPieces % numPlayers :
             (numPlayers - 1) - totalPieces % numPlayers, 0, (numPlayers - 1));
 
-        Piece piece = ObjectFactory.Piece(
-            piecePrefabs[Mathf.FloorToInt(totalPieces / 2)], 
-            layout,
-            players[currentPlayerIndex],
-            startingRotations[Mathf.FloorToInt(totalPieces / 2)]);
-        
-        piece.OnPieceClicked += OnPieceClicked;
+        int index = Mathf.FloorToInt(totalPieces / 2);
+
+        Piece piece = StartStructs[index].useStartPosition ?
+            ObjectFactory.Piece(
+                StartStructs[index].piece,
+                layout,
+                players[currentPlayerIndex],
+                StartStructs[index].startRotation,
+                StartStructs[index].startPosition) :
+            ObjectFactory.Piece(
+                StartStructs[index].piece,
+                layout,
+                players[currentPlayerIndex],
+                StartStructs[index].startRotation);
+
+        piece.OnPieceClicked.AddListener(OnPieceClicked);
+        piece.OnMovementFinished.AddListener(OnMovementFinished);
         piece.OuterInactive = OuterInactive;
         piece.OuterPivot = OuterPivot;
         piece.OuterSelected = OuterSelected;
         piece.InnerActive = currentPlayerIndex == 0 ? P1InnerActive : P2InnerActive;
         piece.InnerDisabled = currentPlayerIndex == 0 ? P1InnerDisabled : P2InnerDisabled;
 
+        if (StartStructs[index].useStartPosition)
+            PiecePlaced(piece);
+        else
+        {
+            currentSelectedPiece = piece;
+            currentBoard.HighlightPlayer(currentPlayerIndex);
 
-        currentSelectedPiece = piece;
-        currentBoard.HighlightPlayer(currentPlayerIndex);
+            UISignals.Click(UISignal.PlayerTurn, currentPlayerIndex);
+        }
+    }
 
-        UISignals.Click(UISignal.PlayerTurn, currentPlayerIndex);
+    private void OnMovementFinished()
+    {
+        if (IsPlayerWin())
+        {
+            SetPhase(GamePhase.End);
+            return;
+        }
+        else
+        {
+            bool anyTurning = false;
+            bool allLegal = true;
+            foreach (Piece piece in players[currentPlayerIndex].pieces)
+            {
+                anyTurning |= piece.rotationRate != 0;
+                allLegal &= IsValidPosition(piece);
+            }
+
+            bool hasTurned = currentSelectedPiece != null && (currentSelectedPiece.targetRotation % 6) != 0;
+            
+
+            if (allLegal && !anyTurning && hasTurned)
+                NextPlayer();
+        }
     }
 
     private void OnPieceClicked(Piece piece, GameHex hex)
@@ -293,7 +342,7 @@ public class Game : MonoBehaviour {
                 {
                     currentSelectedPiece.ResetRotation();
                 }
-
+                lastSelectedPiece = null;
                 currentSelectedPiece = piece;
             }
         }
@@ -309,6 +358,8 @@ public class Game : MonoBehaviour {
         if (currentSelectedPiece != null)
         {
             currentSelectedPiece.LockRotation();
+            if(numPlayers == 1)
+                lastSelectedPiece = currentSelectedPiece;
             currentSelectedPiece = null;
         }
 

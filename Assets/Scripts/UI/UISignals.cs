@@ -15,7 +15,8 @@ public enum UISignal
     ShowBoardSelect,
     Quit,
     PlayerTurn,
-    PlayerWin
+    PlayerWin,
+    Restart
 };
 
 public class UISignals : MonoBehaviour

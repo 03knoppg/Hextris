@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class CurrentPlayerText : UIThing {
 
-    void Start()
+    new void Start()
     {
         base.Start();
         UISignals.AddListeners(OnPlayerChange, new List<UISignal>(){UISignal.PlayerTurn}); 

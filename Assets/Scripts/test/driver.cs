@@ -27,7 +27,8 @@ public class Driver : MonoBehaviour
         UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
             UISignal.SelectBoard,
             UISignal.ShowBoardSelect,
-            UISignal.Quit });
+            UISignal.Quit,
+            UISignal.Restart });
 
         Invoke("LevelSelect", 0.1f);
     }
@@ -56,6 +57,9 @@ public class Driver : MonoBehaviour
                 break;
             case UISignal.Quit:
                 SceneManager.LoadScene("TitleScreen");
+                break;
+            case UISignal.Restart:
+                StartGame(currentGameIndex);
                 break;
         }
     }
