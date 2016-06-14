@@ -199,8 +199,15 @@ public class Piece: MonoBehaviour
 
             else if (Input.GetMouseButton(0))
             {
-                rotationFloat += (Input.mousePosition.x - mouseOffset) / 100;
-                if (Mathf.Abs(rotationFloat) > Mathf.PI / 3)
+                float mouseDelta = (Input.mousePosition.x - mouseOffset) * 20 / Screen.width;
+                if (Mathf.Abs(mouseDelta) > 0.0005f && Mathf.Abs(rotationRate) < 100)
+                {
+                    if (Mathf.Sign(mouseDelta) != Mathf.Sign(rotationFloat))
+                        rotationFloat = 0;
+
+                    rotationFloat += mouseDelta;
+                }
+                if (Mathf.Abs(rotationFloat) > 1)
                 {
                     if (rotationFloat > 0)
                         targetRotation++;
@@ -211,19 +218,21 @@ public class Piece: MonoBehaviour
                 }
                 mouseOffset = Input.mousePosition.x;
             }
+            
 		}
 	   
 		
 		//rotate gameObject and detect collisions until near destination then snap to new position
 
 
-		if (Mathf.Abs(Mathf.DeltaAngle(targetRotation * 60, transform.rotation.eulerAngles.y)) > 0.05f)
+        if (Mathf.Abs(Mathf.DeltaAngle(targetRotation * 60, realRotationFloat)) > 0.05f)
 			realRotationFloat = Mathf.SmoothDampAngle(realRotationFloat, targetRotation * 60, ref rotationRate, 0.3f);
 
-		else if (Mathf.Abs(rotationRate) > 0)
+		else if (Mathf.Abs(rotationRate) > 0 && !Input.GetMouseButton(0))
 		{
 			transform.rotation = Quaternion.Euler(0, targetRotation * 60, 0);
 			rotationRate = 0;
+            rotationFloat = 0;
             OnMovementFinished.Invoke();
 		}
 
