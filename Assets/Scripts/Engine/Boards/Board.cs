@@ -16,9 +16,11 @@ public abstract class Board : MonoBehaviour{
 
     public Material inner;
     public Material outer;
-    public Material highlight; 
+    public Material highlight;
+    public Material outerHighlight;
 
-
+    List<GameHex> highlightGameHexes;
+    float highlightAngle;
 
     public virtual void InitBoard(Layout globalLayout, UISignals UISignals)
     {
@@ -48,16 +50,25 @@ public abstract class Board : MonoBehaviour{
     
     public virtual void HighlightPlayer(int playerIndex)
     {
-        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+        highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+        
+    }
+
+    public virtual void Update()
+    {
         foreach (GameHex gHex in Hexes)
         {
-            if(highlightGameHexes.Contains(gHex))
-                gHex.SetColourOuter(highlight);
+            if (highlightGameHexes.Contains(gHex))
+            {
+                gHex.SetColourOuter(outerHighlight);
+
+            }
             else
                 gHex.SetColourOuter(outer);
 
         }
     }
+
     public virtual bool InStartingArea(Piece piece, int playerIndex)
     {
         foreach(GameHex gHex in piece.GameHexes)

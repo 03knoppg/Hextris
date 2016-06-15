@@ -196,10 +196,14 @@ public class Game : MonoBehaviour {
             else
                 UIState.SetGroupState(UIStates.Group.Undo, UIStates.State.Disabled);
 
-            if (allLegal && !anyTurning && hasTurned)
-                UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Active);
-            else
-                UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Disabled);
+            //if (allLegal && !anyTurning && hasTurned)
+            //    UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Active);
+            //else
+            //    UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Disabled);
+        }
+        else if (currentPhase == GamePhase.End)
+        {
+            UIState.SetGroupState(UIStates.Group.Undo, UIStates.State.Disabled);
         }
     }
 
@@ -247,6 +251,16 @@ public class Game : MonoBehaviour {
                             piece.Mode = Piece.EMode.Inactive;
 
                     }
+                }
+            }
+        }
+        else if (currentPhase == GamePhase.End)
+        {
+            foreach (Player player in players)
+            {
+                foreach (Piece piece in player.pieces)
+                {
+                    piece.Mode = Piece.EMode.Active;
                 }
             }
         }

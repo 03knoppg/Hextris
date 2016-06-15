@@ -18,18 +18,18 @@ public class CustomBoard : Board
 		}
 	}
 
-    public override void HighlightPlayer(int playerIndex)
-    {
-        List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
-        foreach (GameHex gHex in Hexes)
-        {
-            if (highlightGameHexes.Contains(gHex))
-                gHex.SetColourOuter(highlight);
-            else
-                gHex.SetColourOuter(outer);
+    //public override void HighlightPlayer(int playerIndex)
+    //{
+    //    List<GameHex> highlightGameHexes = playerIndex == 0 ? LegalStartingHexesP1 : LegalStartingHexesP2;
+    //    foreach (GameHex gHex in Hexes)
+    //    {
+    //        if (highlightGameHexes.Contains(gHex))
+    //            gHex.SetColourOuter(highlight);
+    //        else
+    //            gHex.SetColourOuter(outer);
 
-        }
-    }
+    //    }
+    //}
 
     public override bool InStartingArea(Hex hex, int playerIndex)
     {

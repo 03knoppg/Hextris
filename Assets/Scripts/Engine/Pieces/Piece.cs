@@ -81,7 +81,10 @@ public class Piece: MonoBehaviour
 						//old pivot hex
                         if (ghex.IsPivotHex)
                         {
-                            ghex.SetColourOuter(OuterPivot);
+                            if (targetRotation == 0)
+                                ghex.SetColourOuter(OuterSelected);
+                            else
+                                ghex.SetColourOuter(OuterInactive);
                             ghex.SetColourInner(InnerPivot);
                         }
                         else if (targetRotation == 0)
