@@ -65,8 +65,10 @@ public class Game : MonoBehaviour {
     public Material OuterPivot;
     public Material OuterSelected;
     public Material P1InnerActive;
+    public Material P1InnerPivot;
     public Material P1InnerDisabled;
     public Material P2InnerActive;
+    public Material P2InnerPivot;
     public Material P2InnerDisabled;
 
 
@@ -293,6 +295,7 @@ public class Game : MonoBehaviour {
         piece.OuterPivot = OuterPivot;
         piece.OuterSelected = OuterSelected;
         piece.InnerActive = currentPlayerIndex == 0 ? P1InnerActive : P2InnerActive;
+        piece.InnerPivot = currentPlayerIndex == 0 ? P1InnerPivot : P2InnerPivot;
         piece.InnerDisabled = currentPlayerIndex == 0 ? P1InnerDisabled : P2InnerDisabled;
 
         if (StartStructs[index].useStartPosition)
@@ -340,7 +343,6 @@ public class Game : MonoBehaviour {
         }
         else if (currentPhase == GamePhase.Main)
         {
-
             if (!hex.IsPivotHex)
             {
                 if(piece.targetRotation == 0)
@@ -420,6 +422,11 @@ public class Game : MonoBehaviour {
 
     public bool IsPlayerWin()
     {
+        foreach (Piece piece in players[currentPlayerIndex].pieces)
+        {
+            if (!IsValidPosition(piece))
+                return false;
+        }
         foreach (Piece piece in players[currentPlayerIndex].pieces)
         {
             if (currentBoard.InStartingArea(piece, (currentPlayerIndex + 1) % 2))

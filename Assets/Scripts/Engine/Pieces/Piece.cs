@@ -41,7 +41,9 @@ public class Piece: MonoBehaviour
     [HideInInspector]
     public Material InnerActive;
     [HideInInspector]
-	public Material InnerDisabled;
+    public Material InnerDisabled;
+    [HideInInspector]
+    public Material InnerPivot;
 
 
 
@@ -77,12 +79,22 @@ public class Piece: MonoBehaviour
                     foreach (GameHex ghex in GameHexes)
 					{
 						//old pivot hex
-						if (ghex.IsPivotHex)
-							ghex.SetColourOuter(OuterPivot);
-						else if (targetRotation == 0)
-							ghex.SetColourOuter(OuterSelected);
-						else
-							ghex.SetColourOuter(OuterInactive);
+                        if (ghex.IsPivotHex)
+                        {
+                            ghex.SetColourOuter(OuterPivot);
+                            ghex.SetColourInner(InnerPivot);
+                        }
+                        else if (targetRotation == 0)
+                        {
+                            ghex.SetColourOuter(OuterSelected);
+                            ghex.SetColourInner(InnerActive);
+                        }
+                        else
+                        {
+                            ghex.SetColourOuter(OuterInactive);
+                            ghex.SetColourInner(InnerDisabled);
+
+                        }
 					}
 					break;
 
@@ -134,7 +146,6 @@ public class Piece: MonoBehaviour
         GameHexes = new List<GameHex>(GetComponentsInChildren<GameHex>());
         foreach (GameHex gHex in GameHexes)
         {
-            gHex.OnHexClicked += OnHexClicked;
             gHex.OnHexMouseDown += OnHexMouseDown;
 			gHex.OnCollision += HexCollision;
 			gHex.OnCollisionExit += HexCollisionExit;
@@ -278,22 +289,16 @@ public class Piece: MonoBehaviour
 
 	private void OnHexMouseDown(GameHex gameHex)
 	{
-		if (rotationRate == 0 && mode == EMode.Active)
+        if (mode != EMode.Inactive)
 		{
 			OnPieceClicked.Invoke(this, gameHex);
 		}
 	}
-
-	private void OnHexClicked(GameHex gameHex)
-	{
-		if (rotationRate == 0 && mode != EMode.Inactive)
-		{
-			OnPieceClicked.Invoke(this, gameHex);
-		}
-	}
-
+    
 	public void SetPivotHex(GameHex pivotHex)
 	{
+        //this could enable an exploit 
+        LockRotation();
 
 		transform.position = pivotHex.transform.position;
 		Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
@@ -332,6 +337,7 @@ public class Piece: MonoBehaviour
 			gHex.SetColourOuter(mat);
 		}
 	}
+
 }
 
 

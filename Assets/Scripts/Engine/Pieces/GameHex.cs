@@ -16,11 +16,7 @@ public class GameHex : MonoBehaviour
 
     public MeshRenderer inner;
     public List<MeshRenderer> corners;
-
-
-    public delegate void ClickAction(GameHex hex);
-    public event ClickAction OnHexClicked;
-
+    
     public delegate void MouseDownAction(GameHex hex);
     public event MouseDownAction OnHexMouseDown;
 
@@ -64,12 +60,6 @@ public class GameHex : MonoBehaviour
     public void Init(Layout globalLayout)
     {
         GolbalLayout = globalLayout;
-    }
-
-    void OnMouseUpAsButton()
-    {
-        if (OnHexClicked != null)
-            OnHexClicked(this);
     }
 
     void OnMouseDown()
