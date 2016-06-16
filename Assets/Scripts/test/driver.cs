@@ -12,7 +12,7 @@ public class Driver : MonoBehaviour
     UIStates UIState;
 
     Game currentGame;
-    int currentGameIndex;
+    public int currentGameIndex;
 
     void Awake()
     {
@@ -22,8 +22,6 @@ public class Driver : MonoBehaviour
     void Start()
     {
         
-        Tests.TestAll();
-
         UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
             UISignal.SelectBoard,
             UISignal.ShowBoardSelect,

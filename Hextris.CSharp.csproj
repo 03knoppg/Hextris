@@ -13,13 +13,11 @@
     <TargetFrameworkIdentifier>.NETFramework</TargetFrameworkIdentifier>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
-    <CompilerResponseFile>
-    </CompilerResponseFile>
+    <CompilerResponseFile></CompilerResponseFile>
     <UnityProjectType>Game:1</UnityProjectType>
     <UnityBuildTarget>Android:13</UnityBuildTarget>
     <UnityVersion>5.3.5f1</UnityVersion>
-    <RootNamespace>
-    </RootNamespace>
+    <RootNamespace></RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -79,8 +77,10 @@
     <Compile Include="Assets\Scripts\ObjectFactory.cs" />
     <Compile Include="Assets\Scripts\UI\CurrentPlayerText.cs" />
     <Compile Include="Assets\Scripts\UI\GameOverText.cs" />
+    <Compile Include="Assets\Scripts\UI\NextPuzzleButton.cs" />
     <Compile Include="Assets\Scripts\UI\PuzzleSelectButton.cs" />
     <Compile Include="Assets\Scripts\UI\TitleScreen.cs" />
+    <Compile Include="Assets\Scripts\UI\Tutorial1.cs" />
     <Compile Include="Assets\Scripts\UI\UIButton.cs" />
     <Compile Include="Assets\Scripts\UI\UISignals.cs" />
     <Compile Include="Assets\Scripts\UI\UIStates.cs" />

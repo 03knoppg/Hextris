@@ -244,7 +244,7 @@ public class Game : MonoBehaviour {
                         if (currentSelectedPiece == piece)
                             piece.Mode = Piece.EMode.Selected;
 
-                        else if (currentSelectedPiece == null || currentSelectedPiece.targetRotation == 0)
+                        else if (currentSelectedPiece == null || (currentSelectedPiece.targetRotation % 6) == 0)
                             piece.Mode = Piece.EMode.Active;
 
                         else
@@ -359,7 +359,7 @@ public class Game : MonoBehaviour {
         {
             if (!hex.IsPivotHex)
             {
-                if(piece.targetRotation == 0)
+                if(piece.targetRotation % 6 == 0)
                     piece.SetPivotHex(hex);
             }
 
