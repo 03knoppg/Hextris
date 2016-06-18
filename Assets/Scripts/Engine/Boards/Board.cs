@@ -5,8 +5,7 @@ using System.Collections;
 				
 public abstract class Board : MonoBehaviour{
 
-    [HideInInspector]
-    public List<GameHex> Hexes;
+    public virtual List<GameHex> Hexes { get; set; }
 
     public List<GameHex> LegalStartingHexesP1;
     public List<GameHex> LegalStartingHexesP2;

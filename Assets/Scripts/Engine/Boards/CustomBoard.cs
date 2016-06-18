@@ -4,11 +4,20 @@ using UnityEngine;
 
 public class CustomBoard : Board
 {
-
+    public override List<GameHex> Hexes
+    {
+        get
+        {
+            return new List<GameHex>(GetComponentsInChildren<GameHex>());
+        }
+        set
+        {
+            base.Hexes = value;
+        }
+    }
     
     protected override void BuildBoard()
     {
-        Hexes = new List<GameHex>(GetComponentsInChildren<GameHex>());
         foreach (GameHex gGex in Hexes)
         {
             Destroy(gGex.GetComponent<Collider>());
