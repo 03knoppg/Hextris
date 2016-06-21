@@ -34,11 +34,11 @@ public class GameHex : MonoBehaviour
             return Hex.Length(hex) == 0;
         }
     }
-    public Point LocalPoint
+    private Point LocalPoint
     {
-        get
+        set
         {
-            return new Point(transform.localPosition.x, transform.localPosition.z);
+            transform.localPosition = new Vector3(value.x, 0.2f * layer, value.y);
         }
     }
     public Point GlobalPoint
@@ -70,17 +70,16 @@ public class GameHex : MonoBehaviour
         hex = HexCalcs.RotateHex(hex, -amount);
     }
 
-    public void UpdateLayout(Point pivotGlobalPoint)
+    public void UpdateHex(Point pivotGlobalPoint)
     {
-        //translate into new layout based on new pivot hex
+        //translate into new position based on new pivot hex
         hex = FractionalHex.HexRound(Layout.PixelToHex(GlobalPoint - pivotGlobalPoint));
         UpdatePosition();
     }
 
     public void UpdatePosition()
     {
-        Point point = Layout.HexToPixel(hex);
-        transform.localPosition = new Vector3(point.x, 0.2f * layer, point.y);
+        LocalPoint = Layout.HexToPixel(hex);
     }
 
     public void SetPosition(Hex hex)

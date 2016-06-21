@@ -301,7 +301,7 @@ public class Piece: MonoBehaviour
 
         foreach (GameHex gameHex in GameHexes)
 		{
-            gameHex.UpdateLayout(pivotPoint);
+            gameHex.UpdateHex(pivotPoint);
             gameHex.SetColourOuter(OuterSelected);
 		}
 
