@@ -9,7 +9,9 @@ public class Game : MonoBehaviour {
 
     public delegate void GamePhaseChange(GamePhase newPhase);
     public GamePhaseChange OnGamePhaseChange;
-    
+
+    public float order;
+
     Layout layout;
 
     public enum GameType
@@ -46,7 +48,7 @@ public class Game : MonoBehaviour {
     Piece currentSelectedPiece;
 
     [SerializeField]
-    GameType type;
+    public GameType type;
 
     [SerializeField]
     Board BoardPrefab;

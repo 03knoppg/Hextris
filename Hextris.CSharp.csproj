@@ -79,6 +79,7 @@
     <Compile Include="Assets\Scripts\UI\GameOverText.cs" />
     <Compile Include="Assets\Scripts\UI\NextPuzzleButton.cs" />
     <Compile Include="Assets\Scripts\UI\PuzzleSelectButton.cs" />
+    <Compile Include="Assets\Scripts\UI\PuzzleSelectPanel.cs" />
     <Compile Include="Assets\Scripts\UI\TitleScreen.cs" />
     <Compile Include="Assets\Scripts\UI\Tutorial1.cs" />
     <Compile Include="Assets\Scripts\UI\UIButton.cs" />

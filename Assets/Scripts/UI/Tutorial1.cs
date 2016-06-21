@@ -32,7 +32,7 @@ public class Tutorial1 : UIThing {
 	// Update is called once per frame
 	void Update () 
     {
-        if (state == UIStates.State.Active)
+        if (State == UIStates.State.Active)
         {
             t = (t + Time.deltaTime / 2) % 1;
             transform.position = new Vector3(Mathf.SmoothStep(Screen.width * startX / 100, Screen.width * stopX / 100, t), transform.position.y, transform.position.z);

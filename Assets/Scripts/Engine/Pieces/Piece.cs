@@ -131,7 +131,7 @@ public class Piece: MonoBehaviour
 	{
 		//get { return new Point(transform.position.x, transform.position.z); }
 		set {
-            transform.localPosition = new Vector3(value.x, 0.5f, value.y);
+            transform.localPosition = new Vector3(value.x, 0, value.y);
         }
 	}
 
@@ -152,6 +152,7 @@ public class Piece: MonoBehaviour
             gHex.OnHexMouseDown += OnHexMouseDown;
 			gHex.OnCollision += HexCollision;
 			gHex.OnCollisionExit += HexCollisionExit;
+            gHex.layer = 1;
 		}
 
 		FixCorners();
@@ -303,7 +304,7 @@ public class Piece: MonoBehaviour
         //this could enable an exploit 
         LockRotation();
 
-		transform.position = pivotHex.transform.position;
+		transform.position = new Vector3(pivotHex.transform.position.x, 0, pivotHex.transform.position.z);
 		Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
 
         foreach (GameHex gameHex in GameHexes)

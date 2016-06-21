@@ -18,11 +18,12 @@ public class CustomBoard : Board
     
     protected override void BuildBoard()
     {
-        foreach (GameHex gGex in Hexes)
+        foreach (GameHex gHex in Hexes)
         {
-            Destroy(gGex.GetComponent<Collider>());
+            if(gHex.layer == 0)
+                Destroy(gHex.GetComponent<Collider>());
 
-            foreach (MeshRenderer corner in gGex.corners)
+            foreach (MeshRenderer corner in gHex.corners)
                 corner.gameObject.SetActive(true);
 		}
 	}

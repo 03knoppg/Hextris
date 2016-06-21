@@ -4,7 +4,10 @@ using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Animator)), RequireComponent(typeof(CanvasGroup))]
 public class UIThing : MonoBehaviour {
-    public UIStates.State state;
+    [SerializeField]
+    UIStates.State state;
+
+    public UIStates.State State { get { return state; } set { OnStateChanged(value); } }
     public UIStates.Group group;
     protected UIStates UIState;
     protected UISignals UISignals;
@@ -30,23 +33,20 @@ public class UIThing : MonoBehaviour {
 
 	}
 
-    public virtual void OnStateChanged(UIStates.State newState)
+    protected virtual void OnStateChanged(UIStates.State newState)
     {
-        if (state == newState || newState == UIStates.State.None)
+        if (state == newState)
             return;
 
         switch (newState)
         {
             case UIStates.State.Active:
-                //gameObject.SetActive(true);
                 animator.SetTrigger("Active");
                 break;
             case UIStates.State.Disabled:
-                //gameObject.SetActive(true);
                 animator.SetTrigger("Disabled");
                 break;
             case UIStates.State.Hidden:
-                //gameObject.SetActive(false);
                 animator.SetTrigger("Hidden");
                 break;
         }

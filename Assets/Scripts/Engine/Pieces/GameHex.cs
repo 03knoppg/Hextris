@@ -26,6 +26,8 @@ public class GameHex : MonoBehaviour
     public delegate void CollisionExit();
     public event CollisionExit OnCollisionExit;
 
+    public int layer = 0;
+
     public bool IsPivotHex
     {
         get
@@ -78,7 +80,6 @@ public class GameHex : MonoBehaviour
     {
         //translate into new layout based on new pivot hex
         hex = FractionalHex.HexRound(Layout.PixelToHex(newLayout, Layout.HexToPixel(oldLayout, hex)));
-        //UpdatePosition(newLayout);
         UpdatePosition(oldLayout);
     }
 
@@ -89,11 +90,8 @@ public class GameHex : MonoBehaviour
 
     public void UpdatePosition(Layout localLayout)
     {
-        //OffsetCoord oc = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
-        //transform.localPosition = new Vector3(oc.col * localLayout.size.x, 0, oc.row * localLayout.size.y);
-        Point position = Layout.HexToPixel(localLayout, hex);
-        transform.localPosition = new Vector3(position.x, 0, position.y);
-
+        Point point = Layout.HexToPixel(localLayout, hex);
+        transform.localPosition = new Vector3(point.x, 0.2f * layer, point.y);
     }
 
     public void SetPosition(Layout layout, Hex hex)

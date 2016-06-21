@@ -18,10 +18,17 @@ public class Driver : MonoBehaviour
     {
         UIState = gameObject.GetComponent<UIStates>();
         UISignals = gameObject.GetComponent<UISignals>();
+
+        GamePrefabs = new List<Game>(Resources.LoadAll<Game>("Prefabs/Games/Puzzle"));
+        GamePrefabs.RemoveAll(game => game.type != Game.GameType.Puzzle);
+        GamePrefabs.Sort(delegate(Game a, Game b)
+        {
+            return a.order.CompareTo(b.order);
+        });
     }
     void Start()
     {
-        
+
         UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
             UISignal.SelectBoard,
             UISignal.ShowBoardSelect,
