@@ -16,6 +16,7 @@ public class Driver : MonoBehaviour
 
     void Awake()
     {
+
         UIState = gameObject.GetComponent<UIStates>();
         UISignals = gameObject.GetComponent<UISignals>();
 

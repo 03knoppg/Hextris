@@ -22,28 +22,27 @@ public class ObjectFactory : MonoBehaviour {
         return Instantiate<Game>(GamePrefab);
     }
 
-    public static GameHex GameHex(Layout GlobalLayout)
+    public static GameHex GameHex()
     {
         GameHex gHex = Instantiate<GameHex>(Instance.GameHexPrefab);
-        gHex.Init(GlobalLayout);
 
         return gHex;
     }
 
-    public static Piece Piece(Piece piecePrefab, Layout layout, Player owner, int startRotation, OffsetCoord? startPosition = null)
+    public static Piece Piece(Piece piecePrefab, Player owner, int startRotation, OffsetCoord? startPosition = null)
     {
         Piece piece = Instantiate<Piece>(piecePrefab);
         piece.name = piecePrefab.name + " " + owner.Name;
-        piece.Init(layout, startRotation, startPosition);
+        piece.Init(startRotation, startPosition);
         owner.pieces.Add(piece);
         return piece;
 
     }
 
-    public static Board Board(Board boardPrefab, Layout globalLayout)
+    public static Board Board(Board boardPrefab)
     {
         Board board = Instantiate<Board>(boardPrefab);
-        board.InitBoard(globalLayout, Instance.UISignals);
+        board.Init(Instance.UISignals);
 
         return board;
     }

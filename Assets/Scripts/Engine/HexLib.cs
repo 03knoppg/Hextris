@@ -243,8 +243,12 @@ public struct Orientation
     public float start_angle;
 }
 
+
+
 public struct Layout
 {
+    public static Layout defaultLayout;
+
     public Layout(Orientation orientation, Point size, Point origin)
     {
         this.orientation = orientation;
@@ -257,6 +261,10 @@ public struct Layout
     static public Orientation pointy = new Orientation(Mathf.Sqrt(3f), Mathf.Sqrt(3f) / 2f, 0f, 3f / 2f, Mathf.Sqrt(3f) / 3f, -1f / 3f, 0f, 2f / 3f, 0.5f);
     static public Orientation flat = new Orientation(3f / 2f, 0f, Mathf.Sqrt(3f) / 2f, Mathf.Sqrt(3f), 2f / 3f, 0f, -1f / 3f, Mathf.Sqrt(3f) / 3f, 0f);
 
+    static public Point HexToPixel(Hex h)
+    {
+        return HexToPixel(Layout.defaultLayout, h);
+    }
     static public Point HexToPixel(Layout layout, Hex h)
     {
         Orientation M = layout.orientation;
@@ -267,6 +275,10 @@ public struct Layout
         return new Point(x + origin.x, y + origin.y);
     }
 
+    static public FractionalHex PixelToHex(Point p)
+    {
+        return PixelToHex(Layout.defaultLayout, p);
+    }
 
     static public FractionalHex PixelToHex(Layout layout, Point p)
     {

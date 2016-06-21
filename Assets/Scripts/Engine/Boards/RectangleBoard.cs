@@ -27,12 +27,12 @@ public class RectangleBoard : Board
 
                 //HexesArray[coord.col, coord.row] = hex;
 
-                newHex = ObjectFactory.GameHex(globalLayout);
+                newHex = ObjectFactory.GameHex();
                 newHex.transform.parent = transform;
                 Hexes.Add(newHex);
                 Destroy(newHex.GetComponent<Collider>());
                 
-                newHex.SetPosition(globalLayout, hex);
+                newHex.SetPosition(hex);
                 foreach (MeshRenderer corner in newHex.corners)
                     corner.gameObject.SetActive(true);
 

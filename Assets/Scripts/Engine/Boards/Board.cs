@@ -11,7 +11,6 @@ public abstract class Board : MonoBehaviour{
     public List<GameHex> LegalStartingHexesP2;
     
     protected UISignals UISignals;
-    protected Layout globalLayout;
 
     public Material inner;
     public Material outer;
@@ -21,9 +20,8 @@ public abstract class Board : MonoBehaviour{
     List<GameHex> highlightGameHexes;
     float highlightAngle;
 
-    public virtual void InitBoard(Layout globalLayout, UISignals UISignals)
+    public virtual void Init(UISignals UISignals)
     {
-        this.globalLayout = globalLayout;
         this.UISignals = UISignals;
 
         BuildBoard();
@@ -72,7 +70,7 @@ public abstract class Board : MonoBehaviour{
     {
         foreach(GameHex gHex in piece.GameHexes)
         {
-            Hex tempHex = FractionalHex.HexRound(Layout.PixelToHex(globalLayout, gHex.GlobalPoint));
+            Hex tempHex = FractionalHex.HexRound(Layout.PixelToHex(gHex.GlobalPoint));
             if (InStartingArea(tempHex, playerIndex))
                 return true;   
         }

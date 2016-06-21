@@ -12,8 +12,6 @@ public class Game : MonoBehaviour {
 
     public float order;
 
-    Layout layout;
-
     public enum GameType
     {
         Classic,
@@ -76,7 +74,7 @@ public class Game : MonoBehaviour {
 
     void Start()
     {
-        layout = new Layout(Layout.pointy, new Point(layoutSize, layoutSize), new Point(0, 0));
+        Layout.defaultLayout = new Layout(Layout.pointy, new Point(layoutSize, layoutSize), new Point(0, 0));
 
         UISignals = FindObjectOfType<UISignals>();
         UIState = FindObjectOfType<UIStates>();
@@ -101,7 +99,7 @@ public class Game : MonoBehaviour {
     public void StartGame()
     {
 
-        currentBoard = ObjectFactory.Board(BoardPrefab, layout);
+        currentBoard = ObjectFactory.Board(BoardPrefab);
 
         SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
@@ -221,8 +219,8 @@ public class Game : MonoBehaviour {
             if (hit)
             {
                 Vector3 point = ray.GetPoint(rayDistance);
-                FractionalHex fHex = Layout.PixelToHex(layout, new Point(point.x, point.z));
-                Point p = Layout.HexToPixel(layout, FractionalHex.HexRound(fHex));
+                FractionalHex fHex = Layout.PixelToHex(new Point(point.x, point.z));
+                Point p = Layout.HexToPixel(FractionalHex.HexRound(fHex));
 
                 currentSelectedPiece.Point = p;
                 if (IsValidPosition(currentSelectedPiece))
@@ -295,13 +293,11 @@ public class Game : MonoBehaviour {
         Piece piece = StartStructs[index].useStartPosition ?
             ObjectFactory.Piece(
                 StartStructs[index].piece,
-                layout,
                 players[currentPlayerIndex],
                 StartStructs[index].startRotation,
                 StartStructs[index].startPosition) :
             ObjectFactory.Piece(
                 StartStructs[index].piece,
-                layout,
                 players[currentPlayerIndex],
                 StartStructs[index].startRotation);
 
@@ -425,7 +421,7 @@ public class Game : MonoBehaviour {
         {
             foreach (GameHex gHex in piece.GameHexes)
             {
-                Hex hex = FractionalHex.HexRound(Layout.PixelToHex(layout,  gHex.GlobalPoint));
+                Hex hex = FractionalHex.HexRound(Layout.PixelToHex(gHex.GlobalPoint));
 
                 if (!currentBoard.InBounds(hex))
                     return false;

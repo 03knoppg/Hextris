@@ -12,7 +12,6 @@ public class GameHex : MonoBehaviour
 
     //public?
     public Hex hex;
-    public static Layout GolbalLayout;
 
     public MeshRenderer inner;
     public List<MeshRenderer> corners;
@@ -54,16 +53,11 @@ public class GameHex : MonoBehaviour
     {
         OffsetCoord coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, hex);
 
-        Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(GolbalLayout, GlobalPoint));
+        Hex globalHex = FractionalHex.HexRound(Layout.PixelToHex(GlobalPoint));
         name = "Hex Global{" + globalHex.q + ", " + globalHex.r + ", " + globalHex.s + "} " + "Offset{" + coord.col + ", " + coord.row + "} Cube{" + hex.q + ", " + hex.r + ", " + hex.s + "}";
 
     }
-
-    public void Init(Layout globalLayout)
-    {
-        GolbalLayout = globalLayout;
-    }
-
+    
     void OnMouseDown()
     {
         if (OnHexMouseDown != null)
@@ -76,28 +70,23 @@ public class GameHex : MonoBehaviour
         hex = HexCalcs.RotateHex(hex, -amount);
     }
 
-    public void UpdateLayout(Layout oldLayout, Layout newLayout)
+    public void UpdateLayout(Point pivotGlobalPoint)
     {
         //translate into new layout based on new pivot hex
-        hex = FractionalHex.HexRound(Layout.PixelToHex(newLayout, Layout.HexToPixel(oldLayout, hex)));
-        UpdatePosition(oldLayout);
+        hex = FractionalHex.HexRound(Layout.PixelToHex(GlobalPoint - pivotGlobalPoint));
+        UpdatePosition();
     }
 
     public void UpdatePosition()
     {
-        UpdatePosition(new Layout(Layout.pointy, new Point(1, 1), new Point(0, 0)));
-    }
-
-    public void UpdatePosition(Layout localLayout)
-    {
-        Point point = Layout.HexToPixel(localLayout, hex);
+        Point point = Layout.HexToPixel(hex);
         transform.localPosition = new Vector3(point.x, 0.2f * layer, point.y);
     }
 
-    public void SetPosition(Layout layout, Hex hex)
+    public void SetPosition(Hex hex)
     {
         this.hex = hex;
-        UpdatePosition(layout);
+        UpdatePosition();
     }
 
     public bool Equals(Hex otherHex)
@@ -122,8 +111,8 @@ public class GameHex : MonoBehaviour
         if (a.Equals(b))
             return true;
 
-        return FractionalHex.HexRound(Layout.PixelToHex(GolbalLayout, a.GlobalPoint)) ==
-            FractionalHex.HexRound(Layout.PixelToHex(GolbalLayout, b.GlobalPoint));
+        return FractionalHex.HexRound(Layout.PixelToHex(a.GlobalPoint)) ==
+            FractionalHex.HexRound(Layout.PixelToHex(b.GlobalPoint));
     }
 
     public static bool operator !=(GameHex a, GameHex b)

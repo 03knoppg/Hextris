@@ -120,13 +120,7 @@ public class Piece: MonoBehaviour
 			mode = value;
 		}
 	}
-
-	//local layout origin is always 0,0
-	//To move the piece simply set the transform position
-	//the position of each hex is based on the local layout where the pivot hex is always at (0,0)
-	public Layout localLayout;
-    public Layout globalLayout;
-
+    
 	public Point Point
 	{
 		//get { return new Point(transform.position.x, transform.position.z); }
@@ -137,14 +131,11 @@ public class Piece: MonoBehaviour
 
 
 
-	public void Init(Layout layout, int startRotation, OffsetCoord? startPosition = null)
+	public void Init(int startRotation, OffsetCoord? startPosition = null)
 	{
 
         OnMovementFinished = new MovementFinished();
         OnPieceClicked = new PieceClicked();
-
-        globalLayout = new Layout(layout.orientation, layout.size, new Point(0, 0)); 
-        localLayout = new Layout(layout.orientation, layout.size, new Point(0, 0));
 
         GameHexes = new List<GameHex>(GetComponentsInChildren<GameHex>());
         foreach (GameHex gHex in GameHexes)
@@ -163,7 +154,7 @@ public class Piece: MonoBehaviour
         targetRotation = startRotation;
         LockRotation();
 
-        Point = Layout.HexToPixel(globalLayout, OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, startPosition.GetValueOrDefault()));
+        Point = Layout.HexToPixel(OffsetCoord.RoffsetToCube(OffsetCoord.EVEN, startPosition.GetValueOrDefault()));
 	}
 
 
@@ -266,7 +257,7 @@ public class Piece: MonoBehaviour
         foreach (GameHex gHex in GameHexes)
 		{
 			gHex.Rotate(targetRotation);
-			gHex.UpdatePosition(localLayout);
+			gHex.UpdatePosition();
 		}
 		FixCorners();
         ResetRotation();
@@ -305,12 +296,13 @@ public class Piece: MonoBehaviour
         LockRotation();
 
 		transform.position = new Vector3(pivotHex.transform.position.x, 0, pivotHex.transform.position.z);
-		Layout newLocalLayout = new Layout(localLayout.orientation, localLayout.size, pivotHex.LocalPoint);
+
+        Point pivotPoint = pivotHex.GlobalPoint;
 
         foreach (GameHex gameHex in GameHexes)
 		{
-			gameHex.UpdateLayout(localLayout, newLocalLayout);
-			pivotHex.SetColourOuter(OuterSelected);
+            gameHex.UpdateLayout(pivotPoint);
+            gameHex.SetColourOuter(OuterSelected);
 		}
 
 		pivotHex.SetColourOuter(OuterPivot);
