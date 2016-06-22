@@ -76,18 +76,19 @@ public class GameHex : MonoBehaviour
         hex = FractionalHex.HexRound(Layout.PixelToHex(GlobalPoint - pivotGlobalPoint));
         UpdatePosition();
     }
-
-    public void UpdatePosition()
-    {
-        LocalPoint = Layout.HexToPixel(hex);
-    }
-
     public void SetPosition(Hex hex)
     {
         this.hex = hex;
         UpdatePosition();
     }
 
+    public void UpdatePosition()
+    {
+        LocalPoint = Layout.HexToPixel(hex);
+    }
+
+
+    #region Operator overrides
     public bool Equals(Hex otherHex)
     {
         return otherHex == hex;
@@ -105,7 +106,7 @@ public class GameHex : MonoBehaviour
             OnCollisionExit();
     }
 
-    public static bool operator ==(GameHex a, GameHex b) 
+    public static bool operator ==(GameHex a, GameHex b)
     {
         if (a.Equals(b))
             return true;
@@ -127,7 +128,8 @@ public class GameHex : MonoBehaviour
     public override int GetHashCode()
     {
         return base.GetHashCode();
-    }
+    } 
+    #endregion
 
     internal void SetColourInner(Material mat)
     {

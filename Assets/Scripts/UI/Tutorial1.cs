@@ -4,39 +4,31 @@ using System.Collections.Generic;
 
 public class Tutorial1 : UIThing {
 
-    public float startX;
-    public float stopX;
-
-    float t;
-
+    public float level;
+    
     new void Start()
     {
         base.Start();
-        UISignals.AddListeners(OnBoardSelect, new List<UISignal>() { UISignal.SelectBoard, UISignal.ShowBoardSelect, UISignal.PlayerWin });
+        UISignals.AddListeners(OnBoardSelect, new List<UISignal>() { UISignal.GameStart, UISignal.ShowBoardSelect, UISignal.PlayerWin });
     }
 
-    private void OnBoardSelect(UISignal signal, object arg1)
+    void OnBoardSelect(UISignal signal, object arg1)
     {
-        if (signal == UISignal.SelectBoard)
+        if (signal == UISignal.GameStart)
         {
-            if (arg1 != null && ((int)arg1) == 0)
-                OnStateChanged(UIStates.State.Active);
+            if (((int)arg1) == level)
+                State = UIStates.State.Active;
 
             else
-                OnStateChanged(UIStates.State.Hidden);
+                State = UIStates.State.Hidden;
         }
         else
-            OnStateChanged(UIStates.State.Hidden);
+            State = UIStates.State.Hidden;
     }
 
-	// Update is called once per frame
-	void Update () 
+    public void Hide()
     {
-        if (State == UIStates.State.Active)
-        {
-            t = (t + Time.deltaTime / 2) % 1;
-            transform.position = new Vector3(Mathf.SmoothStep(Screen.width * startX / 100, Screen.width * stopX / 100, t), transform.position.y, transform.position.z);
-        }
-        else t = 0;
-	}
+        State = UIStates.State.Hidden;
+    }
+
 }

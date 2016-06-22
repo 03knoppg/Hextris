@@ -33,6 +33,9 @@ public class Game : MonoBehaviour {
         public int startRotation;
         public bool useStartPosition;
         public OffsetCoord startPosition;
+        public bool lockPivotHex;
+        public OffsetCoord lockedPivotHex;
+        public bool lockSelected;
     }
     [SerializeField]
     List<StartStruct> StartStructs;
@@ -181,11 +184,11 @@ public class Game : MonoBehaviour {
             bool allLegal = true;
             foreach (Piece piece in players[currentPlayerIndex].pieces)
             {
-                anyTurning |= piece.rotationRate != 0;
+                anyTurning |= piece.IsRotating();
                 allLegal &= IsValidPosition(piece);
             }
 
-            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.targetRotation % 6 != 0;
+            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.IsRotated();
 
             //if (anyTurning || currentSelectedPiece == null)
             //    UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
@@ -241,10 +244,10 @@ public class Game : MonoBehaviour {
 
                     else
                     {
-                        if (currentSelectedPiece == piece)
+                        if (currentSelectedPiece == piece || piece.lockSelected)
                             piece.Mode = Piece.EMode.Selected;
 
-                        else if (currentSelectedPiece == null || (currentSelectedPiece.targetRotation % 6) == 0)
+                        else if (currentSelectedPiece == null || !currentSelectedPiece.IsRotated())
                             piece.Mode = Piece.EMode.Active;
 
                         else
@@ -301,6 +304,13 @@ public class Game : MonoBehaviour {
                 players[currentPlayerIndex],
                 StartStructs[index].startRotation);
 
+        piece.lockSelected = StartStructs[index].lockSelected;
+        piece.lockPivotHex = StartStructs[index].lockPivotHex;
+
+        if (piece.lockPivotHex)
+            piece.SetPivotHex(StartStructs[index].lockedPivotHex, true);
+        
+
         piece.OnPieceClicked.AddListener(OnPieceClicked);
         piece.OnMovementFinished.AddListener(OnMovementFinished);
         piece.OuterInactive = OuterInactive;
@@ -334,11 +344,11 @@ public class Game : MonoBehaviour {
             bool allLegal = true;
             foreach (Piece piece in players[currentPlayerIndex].pieces)
             {
-                anyTurning |= piece.rotationRate != 0;
+                anyTurning |= piece.IsRotating();
                 allLegal &= IsValidPosition(piece);
             }
 
-            bool hasTurned = currentSelectedPiece != null && (currentSelectedPiece.targetRotation % 6) != 0;
+            bool hasTurned = currentSelectedPiece != null && currentSelectedPiece.IsRotated();
             
 
             if (allLegal && !anyTurning && hasTurned)
@@ -357,7 +367,7 @@ public class Game : MonoBehaviour {
         {
             if (!hex.IsPivotHex)
             {
-                if(piece.targetRotation % 6 == 0)
+                if(!piece.IsRotated())
                     piece.SetPivotHex(hex);
             }
 

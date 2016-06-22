@@ -9,6 +9,12 @@ using UnityEngine;
 
 public struct Point
 {
+    public Point(Transform t)
+    {
+        x = t.position.x;
+        y = t.position.z;
+    }
+
     public Point(float x, float y)
     {
         this.x = x;

@@ -19,18 +19,19 @@ public class Piece: MonoBehaviour
 
     public List<GameHex> GameHexes;
 
-    public float mouseOffset;
+    float mouseOffset;
 
-    public int previousRotation = 0;
+    int previousRotation = 0;
 	
-	public int targetRotation = 0;
-	public int lastGoodRotation = 0;
-	public float rotationFloat = 0;
-	public float rotationRate = 0;
-	public float oldRotateAngle = 0;
+	int targetRotation = 0;
+	int lastGoodRotation = 0;
+	float rotationFloat = 0;
+	float rotationRate = 0;
 
-	public float realRotationFloat = 0;
-	public bool colliding = false;
+	float realRotationFloat = 0;
+    public bool colliding = false;
+    public bool lockPivotHex;
+    public bool lockSelected;
 
     [HideInInspector]
     public Material OuterInactive;
@@ -57,6 +58,7 @@ public class Piece: MonoBehaviour
 		Inactive  //unable to be selected
 	}
 
+    [SerializeField]
 	EMode mode;
 	public EMode Mode
 	{
@@ -263,13 +265,22 @@ public class Piece: MonoBehaviour
         ResetRotation();
 	}
 
+    public bool IsRotated()
+    {
+        return (targetRotation % 6) != 0;
+    }
+
+    public bool IsRotating()
+    {
+        return rotationRate != 0;
+    }
+
 	public void ResetRotation()
 	{
         targetRotation = 0;
         lastGoodRotation = 0;
         rotationFloat = 0;
         rotationRate = 0;
-        oldRotateAngle = 0;
 
         realRotationFloat = 0;
 		transform.rotation = Quaternion.identity;
@@ -289,9 +300,26 @@ public class Piece: MonoBehaviour
 			OnPieceClicked.Invoke(this, gameHex);
 		}
 	}
-    
-	public void SetPivotHex(GameHex pivotHex)
+
+    public void SetPivotHex(OffsetCoord coord, bool force = false)
+    {
+        foreach (GameHex gHex in GameHexes)
+        {
+            if (gHex.coord.col == coord.col && gHex.coord.row == coord.row)
+            {
+                SetPivotHex(gHex, force);
+                return;
+            }
+        }
+
+        Debug.LogWarning("SetPivotHex(OffsetCoord) Hex not found");
+    }
+
+    public void SetPivotHex(GameHex pivotHex, bool force = false)
 	{
+        if (lockPivotHex && !force)
+            return;
+
         //this could enable an exploit 
         LockRotation();
 

@@ -7,11 +7,7 @@ public class Player {
     public List<Piece> pieces = new List<Piece>();
     public string Name;
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
+
 	// Update is called once per frame
 	void Update () {
 	
@@ -23,6 +19,7 @@ public class Player {
         {
             if (active)
                 p.Mode = Piece.EMode.Active;
+            
             else
                 p.Mode = Piece.EMode.Disabled;
         }

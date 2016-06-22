@@ -7,6 +7,7 @@ public class GameHexEditor : Editor {
 
     void OnSceneGUI()
     {
+        Layout.defaultLayout = new Layout(Layout.pointy, new Point(1, 1), new Point(0, 0));
         if (Event.current != null)
         {
             GameHex gHex = target as GameHex;
@@ -17,8 +18,7 @@ public class GameHexEditor : Editor {
             }
             else if (Event.current.type == EventType.MouseDrag)
             {
-                Layout defaultLayout = new Layout(Layout.pointy, new Point(1, 1), new Point(0, 0));
-                gHex.hex = FractionalHex.HexRound(Layout.PixelToHex(defaultLayout, gHex.GlobalPoint));
+                gHex.UpdateHex(new Point(gHex.transform.parent.transform));
 
                 gHex.coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, gHex.hex);
 

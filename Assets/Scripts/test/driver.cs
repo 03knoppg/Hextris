@@ -76,6 +76,8 @@ public class Driver : MonoBehaviour
             currentGame.End();
 
         currentGame = ObjectFactory.Game(GamePrefabs[currentGameIndex]);
+
+        UISignals.Click(UISignal.GameStart, index);
     }
 
 }
