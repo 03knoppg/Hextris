@@ -146,6 +146,7 @@ public class Piece: MonoBehaviour
 			gHex.OnCollision += HexCollision;
 			gHex.OnCollisionExit += HexCollisionExit;
             gHex.layer = 1;
+            gHex.UpdatePosition();
 		}
 
 		FixCorners();

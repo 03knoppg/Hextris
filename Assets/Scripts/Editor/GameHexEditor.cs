@@ -2,7 +2,7 @@
 using UnityEditor;
 using System.Collections;
 
-[CustomEditor(typeof(GameHex))]
+[CustomEditor(typeof(GameHex)), CanEditMultipleObjects]
 public class GameHexEditor : Editor {
 
     void OnSceneGUI()
@@ -18,10 +18,10 @@ public class GameHexEditor : Editor {
             }
             else if (Event.current.type == EventType.MouseDrag)
             {
+                gHex.layer = Mathf.RoundToInt(gHex.transform.localPosition.y * 5);
                 gHex.UpdateHex(new Point(gHex.transform.parent.transform));
 
                 gHex.coord = OffsetCoord.RoffsetFromCube(OffsetCoord.EVEN, gHex.hex);
-
             }
         }
     }
