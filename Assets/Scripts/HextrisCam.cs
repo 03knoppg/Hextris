@@ -5,6 +5,12 @@ using System.Collections.Generic;
 public class HextrisCam : MonoBehaviour {
 
     //Vector3 oldMousePos;
+    public float hDist;
+    public float vDist;
+    public float distance;
+    public float angle;
+    public Bounds bounds;
+    Camera cam;
 
 	// Use this for initialization
 	void Start () {
@@ -13,10 +19,45 @@ public class HextrisCam : MonoBehaviour {
 
     private void OnCamPosition(UISignal signal, object arg1)
     {
-        transform.position = (Vector3) arg1;
+
+        bounds = (Bounds)arg1;
+
+        cam = GetComponent<Camera>();
+
     }
-	
-    
+
+    void Update()
+    {
+        if (cam == null)
+            return;
+        
+        float vFOV = Mathf.Deg2Rad * cam.fieldOfView;
+        float hFOV = 2 * Mathf.Atan(Mathf.Tan(vFOV / 2) * cam.aspect);
+      
+
+        angle = Mathf.Deg2Rad * transform.rotation.eulerAngles.x;
+
+        hDist = bounds.extents.x / Mathf.Sin(hFOV / 2);
+
+        vDist = Mathf.Sin(angle) * bounds.extents.z / Mathf.Sin(vFOV / 2);
+
+        distance = Mathf.Max(hDist, vDist);
+
+
+        float x = bounds.center.x;
+
+        float y = bounds.center.y + distance * Mathf.Sin(angle);
+
+        float z = bounds.center.z - (distance + bounds.extents.z) * Mathf.Cos(angle);
+
+        transform.position = new Vector3(x, y, z);
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawWireCube(bounds.center, bounds.size);
+    }
+   
 
 	// Update is called once per frame
     //void Update () {

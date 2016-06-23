@@ -57,8 +57,6 @@ public class Game : MonoBehaviour {
     UISignals UISignals;
     UIStates UIState;
 
-
-    public Vector3 CamPosition;
     public float layoutSize = 1;
     public int numPlayers = 1;
 
@@ -107,8 +105,16 @@ public class Game : MonoBehaviour {
         SetPhase(GamePhase.Setup);
         MakeNextPlacementPiece();
 
-        UISignals.Click(UISignal.CamPosition, CamPosition); 
+        if (currentBoard.Hexes.Count > 0)
+        {
+            Bounds boardBounds = new Bounds(currentBoard.Hexes[0].transform.position, Vector3.zero);
+            foreach (GameHex gHex in currentBoard.Hexes)
+            {
+                boardBounds.Encapsulate(new Bounds(gHex.transform.position, Vector3.one * 2));
+            }
 
+            UISignals.Click(UISignal.CamPosition, boardBounds);
+        }
     }
 
     public void OnUISignal(UISignal signal, object arg1)
