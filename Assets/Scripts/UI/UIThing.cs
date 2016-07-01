@@ -10,21 +10,24 @@ public class UIThing : MonoBehaviour {
     public UIStates.State State { get { return state; } set { OnStateChanged(value); } }
     public UIStates.Group group;
     protected UIStates UIState;
-    protected UISignals UISignals;
+    protected Signals UISignals;
 
     Animator animator;
     
 
 	// Use this for initialization
-    protected void Start()
+    protected void Awake()
     {
         animator = gameObject.GetComponent<Animator>();
 
         UIState = FindObjectOfType<UIStates>();
-        UISignals = FindObjectOfType<UISignals>();
-        if(group != UIStates.Group.None)
-            UIState.GetEvent(group).AddListener(OnStateChanged);
+        UISignals = FindObjectOfType<Signals>();
+    }
 
+    protected void Start()
+    {
+        if (group != UIStates.Group.None)
+            UIState.GetEvent(group).AddListener(OnStateChanged);
         //force animator into startstate
         UIStates.State startState = state;
         state = UIStates.State.None;
@@ -37,6 +40,11 @@ public class UIThing : MonoBehaviour {
     {
         if (state == newState)
             return;
+
+
+        animator.ResetTrigger("Active");
+        animator.ResetTrigger("Disabled");
+        animator.ResetTrigger("Hidden");
 
         switch (newState)
         {

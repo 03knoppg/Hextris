@@ -12,4 +12,10 @@ public class TitleScreen : MonoBehaviour {
     {
         SceneManager.LoadScene("Puzzle");
     }
+
+    public void RestartProgression()
+    {
+        PlayerPrefs.DeleteAll();
+    }
+
 }

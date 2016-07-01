@@ -14,10 +14,10 @@ public class HextrisCam : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        FindObjectOfType<UISignals>().AddListeners(OnCamPosition, new List<UISignal>() { UISignal.CamPosition });
+        FindObjectOfType<Signals>().AddListeners(OnCamPosition, new List<Signal>() { Signal.CamPosition });
 	}
 
-    private void OnCamPosition(UISignal signal, object arg1)
+    private void OnCamPosition(Signal signal, object arg1)
     {
 
         bounds = (Bounds)arg1;

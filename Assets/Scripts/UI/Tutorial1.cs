@@ -9,12 +9,12 @@ public class Tutorial1 : UIThing {
     new void Start()
     {
         base.Start();
-        UISignals.AddListeners(OnBoardSelect, new List<UISignal>() { UISignal.GameStart, UISignal.ShowBoardSelect, UISignal.PlayerWin });
+        UISignals.AddListeners(OnBoardSelect, new List<Signal>() { Signal.GameStart, Signal.ShowBoardSelect, Signal.PlayerWin });
     }
 
-    void OnBoardSelect(UISignal signal, object arg1)
+    void OnBoardSelect(Signal signal, object arg1)
     {
-        if (signal == UISignal.GameStart)
+        if (signal == Signal.GameStart)
         {
             if (((int)arg1) == level)
                 State = UIStates.State.Active;

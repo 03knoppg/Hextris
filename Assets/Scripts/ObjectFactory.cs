@@ -8,7 +8,7 @@ public class ObjectFactory : MonoBehaviour {
     static ObjectFactory Instance;
 
     [SerializeField]
-    UISignals UISignals;
+    Signals UISignals;
     [SerializeField]
     GameHex GameHexPrefab;
 

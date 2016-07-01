@@ -7,64 +7,69 @@ using UnityEngine.SceneManagement;
 public class Driver : MonoBehaviour
 {
 
-    public List<Game> GamePrefabs;
-    UISignals UISignals;
+    Signals Signals;
     UIStates UIState;
 
     Game currentGame;
-    public int currentGameIndex;
+    public static int currentGameIndex;
 
     void Awake()
     {
-
         UIState = gameObject.GetComponent<UIStates>();
-        UISignals = gameObject.GetComponent<UISignals>();
-
-        GamePrefabs = new List<Game>(Resources.LoadAll<Game>("Prefabs/Games/Puzzle"));
-        GamePrefabs.RemoveAll(game => game.type != Game.GameType.Puzzle);
-        GamePrefabs.Sort(delegate(Game a, Game b)
-        {
-            return a.order.CompareTo(b.order);
-        });
+        Signals = gameObject.GetComponent<Signals>();
     }
     void Start()
     {
 
-        UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
-            UISignal.SelectBoard,
-            UISignal.ShowBoardSelect,
-            UISignal.Quit,
-            UISignal.Restart });
+        Signals.AddListeners(OnSignal, new List<Signal>() { 
+            Signal.ShowBoardSelect,
+            Signal.SelectBoard,
+            Signal.Quit,
+            Signal.Restart });
+
+        Signals.AddListeners(OnSignalOne, new List<Signal>() { 
+            Signal.SelectBoard });
 
         Invoke("LevelSelect", 0.1f);
     }
 
     void LevelSelect()
     {
-        if (GamePrefabs.Count > 1)
-            UISignals.Click(UISignal.ShowBoardSelect);
+        if (Progression.Puzzles.Count > 1)
+            Signals.Invoke(Signal.ShowBoardSelect);
         else
             StartGame(0);
 
     }
 
-    private void OnUISignal(UISignal signal, object arg1)
+    private void OnSignal(Signal signal)
     {
         switch (signal)
         {
-            case UISignal.SelectBoard:
-                currentGameIndex = (int)(arg1 ?? ++currentGameIndex);
-                StartGame(currentGameIndex);
-                break;
-            case UISignal.ShowBoardSelect:
+            case Signal.ShowBoardSelect:
                 UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
                 UIState.SetGroupState(UIStates.Group.EndTurn, UIStates.State.Hidden);
                 UIState.SetGroupState(UIStates.Group.PuzzleSelection, UIStates.State.Active);
                 break;
-            case UISignal.Quit:
+            case Signal.SelectBoard:
+                currentGameIndex = ++currentGameIndex;
+                StartGame(currentGameIndex);
+                break;
+            case Signal.Quit:
                 SceneManager.LoadScene("TitleScreen");
                 break;
-            case UISignal.Restart:
+            case Signal.Restart:
+                StartGame(currentGameIndex);
+                break;
+        }
+    }
+
+    private void OnSignalOne(Signal signal, object arg1)
+    {
+        switch (signal)
+        {
+            case Signal.SelectBoard:
+                currentGameIndex = (int)arg1;
                 StartGame(currentGameIndex);
                 break;
         }
@@ -75,9 +80,9 @@ public class Driver : MonoBehaviour
         if (currentGame != null)
             currentGame.End();
 
-        currentGame = ObjectFactory.Game(GamePrefabs[currentGameIndex]);
+        currentGame = ObjectFactory.Game(Progression.Puzzles[currentGameIndex].prefab);
 
-        UISignals.Click(UISignal.GameStart, index);
+        Signals.Invoke(Signal.GameStart, index);
     }
 
 }

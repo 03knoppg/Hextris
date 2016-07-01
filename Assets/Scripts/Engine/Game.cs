@@ -54,7 +54,7 @@ public class Game : MonoBehaviour {
     [SerializeField]
     Board BoardPrefab;
 
-    UISignals UISignals;
+    Signals Signals;
     UIStates UIState;
 
     public float layoutSize = 1;
@@ -77,14 +77,14 @@ public class Game : MonoBehaviour {
     {
         Layout.defaultLayout = new Layout(Layout.pointy, new Point(layoutSize, layoutSize), new Point(0, 0));
 
-        UISignals = FindObjectOfType<UISignals>();
+        Signals = FindObjectOfType<Signals>();
         UIState = FindObjectOfType<UIStates>();
 
-        UISignals.AddListeners(OnUISignal, new List<UISignal>() { 
-            UISignal.RotateCCW, 
-            UISignal.RotateUndo, 
-            UISignal.RotateCW, 
-            UISignal.EndTurn});
+        Signals.AddListeners(OnUISignal, new List<Signal>() { 
+            Signal.RotateCCW, 
+            Signal.RotateUndo, 
+            Signal.RotateCW, 
+            Signal.EndTurn});
 
         players = new List<Player>();
         for (int i = 0; i < numPlayers; i++)
@@ -113,24 +113,24 @@ public class Game : MonoBehaviour {
                 boardBounds.Encapsulate(new Bounds(gHex.transform.position, Vector3.one * 2));
             }
 
-            UISignals.Click(UISignal.CamPosition, boardBounds);
+            Signals.Invoke(Signal.CamPosition, boardBounds);
         }
     }
 
-    public void OnUISignal(UISignal signal, object arg1)
+    public void OnUISignal(Signal signal, object arg1)
     {
         switch (signal)
         {
-            case UISignal.EndTurn:
+            case Signal.EndTurn:
                 OnMovementFinished();
                 break;
-            case UISignal.RotateCCW:
+            case Signal.RotateCCW:
                 currentSelectedPiece.RotateCCW();
                 break;
-            case UISignal.RotateCW:
+            case Signal.RotateCW:
                 currentSelectedPiece.RotateCW();
                 break;
-            case UISignal.RotateUndo:
+            case Signal.RotateUndo:
                 if (lastSelectedPiece != null)
                     lastSelectedPiece.UndoRotation();
                 else
@@ -159,7 +159,6 @@ public class Game : MonoBehaviour {
                 UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Active);
                 break;
             case GamePhase.End:
-                UISignals.Click(UISignal.PlayerWin, currentPlayerIndex);
                 UIState.SetGroupState(UIStates.Group.EndGame, UIStates.State.Active);
                 UIState.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
                 foreach (Player player in players)
@@ -333,7 +332,7 @@ public class Game : MonoBehaviour {
             currentSelectedPiece = piece;
             currentBoard.HighlightPlayer(currentPlayerIndex);
 
-            UISignals.Click(UISignal.PlayerTurn, currentPlayerIndex);
+            Signals.Invoke(Signal.PlayerTurn, currentPlayerIndex);
         }
     }
 
@@ -341,6 +340,10 @@ public class Game : MonoBehaviour {
     {
         if (IsPlayerWin())
         {
+            if (type == GameType.Classic)
+                Signals.Invoke(Signal.PlayerWin, currentPlayerIndex);
+            else
+                Signals.Invoke(Signal.PuzzleComplete, 3);
             SetPhase(GamePhase.End);
             return;
         }
@@ -394,7 +397,7 @@ public class Game : MonoBehaviour {
         currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
         
         currentBoard.HighlightPlayer(currentPlayerIndex + 1);
-        UISignals.Click(UISignal.PlayerTurn, currentPlayerIndex);
+        Signals.Invoke(Signal.PlayerTurn, currentPlayerIndex);
 
         if (currentSelectedPiece != null)
         {

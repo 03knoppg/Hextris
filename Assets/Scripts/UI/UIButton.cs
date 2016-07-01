@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class UIButton : UIThing {
 
-    public UISignal signal;
+    public Signal signal;
 
 	// Use this for initialization
     protected new void Start()
@@ -16,6 +16,6 @@ public class UIButton : UIThing {
 
     protected virtual void Click()
     {
-        UISignals.Click(signal);
+        UISignals.Invoke(signal);
     }
 }

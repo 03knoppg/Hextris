@@ -8,14 +8,14 @@ public class NextPuzzleButton : UIButton {
 	new void Start () {
         base.Start();
 
-        UISignals.AddListeners(OnBoardSelect, new List<UISignal>() { UISignal.SelectBoard });
+        UISignals.AddListeners(OnBoardSelect, new List<Signal>() { Signal.SelectBoard });
 	}
 
-    private void OnBoardSelect(UISignal signal, object arg1)
+    private void OnBoardSelect(Signal signal, object arg1)
     {
-        if (signal == UISignal.SelectBoard)
+        if (signal == Signal.SelectBoard)
         {
-            if (FindObjectOfType<Driver>().currentGameIndex == (FindObjectOfType<Driver>().GamePrefabs.Count - 1))
+            if (Driver.currentGameIndex == (Progression.Puzzles.Count - 1))
                 OnStateChanged(UIStates.State.Disabled);
             
             else

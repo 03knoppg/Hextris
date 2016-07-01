@@ -10,7 +10,7 @@ public abstract class Board : MonoBehaviour{
     public List<GameHex> LegalStartingHexesP1;
     public List<GameHex> LegalStartingHexesP2;
     
-    protected UISignals UISignals;
+    protected Signals UISignals;
 
     public Material inner;
     public Material outer;
@@ -20,7 +20,7 @@ public abstract class Board : MonoBehaviour{
     List<GameHex> highlightGameHexes;
     float highlightAngle;
 
-    public virtual void Init(UISignals UISignals)
+    public virtual void Init(Signals UISignals)
     {
         this.UISignals = UISignals;
 
