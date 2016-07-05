@@ -5,11 +5,11 @@ using System.Collections.Generic;
 public class HextrisCam : MonoBehaviour {
 
     //Vector3 oldMousePos;
-    public float hDist;
-    public float vDist;
-    public float distance;
-    public float angle;
-    public Bounds bounds;
+    float hDist;
+    float vDist;
+    float distance;
+    float angle;
+    Bounds bounds;
     Camera cam;
 
 	// Use this for initialization

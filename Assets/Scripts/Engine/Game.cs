@@ -117,7 +117,7 @@ public class Game : MonoBehaviour {
         }
     }
 
-    public void OnUISignal(Signal signal, object arg1)
+    public void OnUISignal(Signal signal)
     {
         switch (signal)
         {

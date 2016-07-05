@@ -27,6 +27,7 @@ public class Piece: MonoBehaviour
 	int lastGoodRotation = 0;
 	float rotationFloat = 0;
 	float rotationRate = 0;
+    int rotationDirection = 1;
 
 	float realRotationFloat = 0;
     public bool colliding = false;
@@ -204,7 +205,11 @@ public class Piece: MonoBehaviour
 		if (mode == EMode.Selected && !colliding)
 		{
             if (Input.GetMouseButtonDown(0))
+            {
                 mouseOffset = Input.mousePosition.x;
+                rotationDirection = Camera.main.WorldToScreenPoint(transform.position).y - Input.mousePosition.y > 50 ?
+                    -1 : 1;
+            }
 
             else if (Input.GetMouseButton(0))
             {
@@ -219,9 +224,9 @@ public class Piece: MonoBehaviour
                 if (Mathf.Abs(rotationFloat) > 1)
                 {
                     if (rotationFloat > 0)
-                        targetRotation++;
+                        targetRotation = targetRotation + rotationDirection;
                     else if (rotationFloat < 0)
-                        targetRotation--;
+                        targetRotation = targetRotation - rotationDirection;
 
                     rotationFloat = 0;
                 }
