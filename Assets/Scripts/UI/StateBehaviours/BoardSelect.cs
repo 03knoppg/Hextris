@@ -5,7 +5,7 @@ public class BoardSelect : HextrisStateMachineBehaviour
 {
     protected override void OnEnter()
     {
-        AddListeners(new List<ESignalType> { ESignalType.StartPuzzle });
+        AddListeners(new List<ESignalType> { ESignalType.StartPuzzle, ESignalType.Quit });
         AddListenersOne(new List<ESignalType> { ESignalType.StartPuzzle });
 
         UIStates.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
