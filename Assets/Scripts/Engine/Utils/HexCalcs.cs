@@ -54,12 +54,12 @@ public static class HexCalcs
 		//could use some optimization
 		int rank = GetRank (position);
 		
-        //???
+		//???
 		//return ((position - 1 - totalPositionsByRank(rank - 1)) + (6 * rank) ) % (rank * 6) + totalPositionsByRank(rank - 1);
 
-        return rank == GetRank(position - 1) ? position - 1 : position + positionsInRank(rank) - 1;
-    
-    }
+		return rank == GetRank(position - 1) ? position - 1 : position + positionsInRank(rank) - 1;
+	
+	}
 	
 	
 	//return position adjcent to position in same rank in clockwise direction
@@ -71,12 +71,12 @@ public static class HexCalcs
 		//could use some optimization
 		int rank = GetRank (position);
 		
-        //?
+		//?
 		//return ((position + 1 - totalPositionsByRank(rank -1)) % (rank * 6) ) + totalPositionsByRank(rank -1);
 
-        return (position + 1) % positionsInRank(rank);
-    
-    }
+		return (position + 1) % positionsInRank(rank);
+	
+	}
 	
 	public static int GetRank(int position)
 	{
@@ -107,41 +107,41 @@ public static class HexCalcs
 		
 	}
 
-    static public Hex cube_to_hex(Vector2 h) // axial
-    {
-        int q = (int)h.x;
-        int r = (int)h.y;
-        return new Hex(q, -(q + r), r);
-    }
+	static public Hex cube_to_hex(Vector2 h) // axial
+	{
+		int q = (int)h.x;
+		int r = (int)h.y;
+		return new Hex(q, -(q + r), r);
+	}
 
-    public static Vector3 hex_to_cube(Hex h)//: # axial
-    {
-        float x = h.q;
-        float z = h.r;
-        float y = -x - z;
-        return new Vector3(x, y, z);
-    }
+	public static Vector3 hex_to_cube(Hex h)//: # axial
+	{
+		float x = h.q;
+		float z = h.r;
+		float y = -x - z;
+		return new Vector3(x, y, z);
+	}
 
-    public static Hex RotateHex(Hex hex, int direction)
-    {
+	public static Hex RotateHex(Hex hex, int direction)
+	{
 
-        Vector3 cube = HexCalcs.hex_to_cube(hex);
-        for (; direction > 0; direction--)
-        {
-            float temp = cube.x;
-            cube.x = -cube.z;
-            cube.z = -cube.y;
-            cube.y = -temp;
-        }
-        for (; direction < 0; direction++)
-        {
-            float temp = cube.x;
-            cube.x = -cube.y;
-            cube.y = -cube.z;
-            cube.z = -temp;
-        }
-        return HexCalcs.cube_to_hex(cube);
-    }
+		Vector3 cube = HexCalcs.hex_to_cube(hex);
+		for (; direction > 0; direction--)
+		{
+			float temp = cube.x;
+			cube.x = -cube.z;
+			cube.z = -cube.y;
+			cube.y = -temp;
+		}
+		for (; direction < 0; direction++)
+		{
+			float temp = cube.x;
+			cube.x = -cube.y;
+			cube.y = -cube.z;
+			cube.z = -temp;
+		}
+		return HexCalcs.cube_to_hex(cube);
+	}
 }
 
 

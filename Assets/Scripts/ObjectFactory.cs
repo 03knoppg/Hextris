@@ -1,14 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 
 public class ObjectFactory : MonoBehaviour {
 
 
     static ObjectFactory Instance;
-
-    [SerializeField]
-    Signals UISignals;
+    
     [SerializeField]
     GameHex GameHexPrefab;
 
@@ -19,30 +15,34 @@ public class ObjectFactory : MonoBehaviour {
 
     public static Game Game(Game GamePrefab)
     {
-        return Instantiate<Game>(GamePrefab);
+        Game game = Instantiate(GamePrefab);
+        game.Init();
+        return game;
     }
 
     public static GameHex GameHex()
     {
-        GameHex gHex = Instantiate<GameHex>(Instance.GameHexPrefab);
+        GameHex gHex = Instantiate(Instance.GameHexPrefab);
 
         return gHex;
     }
-
-    public static Piece Piece(Piece piecePrefab, Player owner, int startRotation, OffsetCoord? startPosition = null)
+    
+    public static Piece Piece(Game.PieceData startStruct)
     {
-        Piece piece = Instantiate<Piece>(piecePrefab);
-        piece.name = piecePrefab.name + " " + owner.Name;
-        piece.Init(startRotation, startPosition);
-        owner.pieces.Add(piece);
+        Piece piece = Instantiate(startStruct.piecePrefab);
+        piece.Init(startStruct.startRotation, startStruct.startPosition);
+
+        piece.lockSelected = startStruct.lockSelected;
+        piece.lockPivotHex = startStruct.lockPivotHex;
+
         return piece;
 
     }
 
     public static Board Board(Board boardPrefab)
     {
-        Board board = Instantiate<Board>(boardPrefab);
-        board.Init(Instance.UISignals);
+        Board board = Instantiate(boardPrefab);
+        board.Init();
 
         return board;
     }

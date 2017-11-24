@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class HextrisCam : MonoBehaviour {
 
@@ -14,15 +13,16 @@ public class HextrisCam : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        FindObjectOfType<Signals>().AddListeners(OnCamPosition, new List<Signal>() { Signal.CamPosition });
+        cam = GetComponent<Camera>();
+
+        Signals.AddListeners(OnCamPosition, new List<ESignalType>() { ESignalType.CamPosition });
 	}
 
-    private void OnCamPosition(Signal signal, object arg1)
+    private void OnCamPosition(ESignalType signal, object arg1)
     {
 
         bounds = (Bounds)arg1;
 
-        cam = GetComponent<Camera>();
 
     }
 

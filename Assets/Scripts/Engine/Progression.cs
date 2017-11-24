@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public struct Puzzle
 {
@@ -10,81 +9,68 @@ public struct Puzzle
     public Game prefab;
 }
 
-public class Progression : MonoBehaviour{
+public class Progression
+{
+    static AnimatorIntWrapper<List<Puzzle>> _puzzles;
+    public static AnimatorIntWrapper<List<Puzzle>> Puzzles {
+        get { return _puzzles; }
+        }
 
-    
-
-    static Progression instance;
-    static Progression Instance
-    { get { return instance; } }
-
-    List<Puzzle> puzzles;
-    public static List<Puzzle> Puzzles { get { return Instance.puzzles; } }
-
-    Signals UISignals;
-
-    void Awake()
+    public static void Init(Animator animator)
     {
-        instance = this;
-
         List<Game> GamePrefabs = new List<Game>(Resources.LoadAll<Game>("Prefabs/Games/Puzzle"));
-        GamePrefabs.RemoveAll(game => game.type != Game.GameType.Puzzle);
         GamePrefabs.Sort(delegate(Game a, Game b)
         {
             return a.order.CompareTo(b.order);
         });
-
-        puzzles = new List<Puzzle>();
+        
+        _puzzles = new AnimatorIntWrapper<List<Puzzle>>(new List<Puzzle>(), animator, "PuzzleCount", x=>x.Count);
         foreach (Game game in GamePrefabs)
         {
-            Puzzle puzzle = new Puzzle();
-            puzzle.name = game.name;
-            puzzle.stars = PlayerPrefs.GetInt(puzzle.name + "stars", 0);
-            if (puzzles.Count == 0) //first level is always unlocked
-                puzzle.unlocked = true;
-            else
-                puzzle.unlocked = PlayerPrefs.GetInt(puzzle.name + "unlocked", 0) != 0;
+            Puzzle puzzle = new Puzzle() {
+                name = game.name,
+                stars = PlayerPrefs.GetInt(game.name + "stars", 0),
+                unlocked = Puzzles.Obj.Count == 0 || PlayerPrefs.GetInt(game.name + "unlocked", 0) != 0,
+                prefab = game
+           };
 
-            puzzle.prefab = game;
-            puzzles.Add(puzzle);
+            Puzzles.Call(x=>x.Add(puzzle));
         }
-    }
-    void Start()
-    {
-        UISignals = gameObject.GetComponent<Signals>();
-        UISignals.AddListeners(OnSignal, new List<Signal>() { 
-            Signal.PuzzleComplete });
+
+        Signals.AddListeners(OnSignal, new List<ESignalType>() {
+            ESignalType.PuzzleComplete });
     }
 
-    private void OnSignal(Signal arg0, object stars)
+
+    static private void OnSignal(ESignalType arg0, object stars)
     {
-        PuzzleComplete(Driver.currentGameIndex, (int)stars);
+        PuzzleComplete(Game.currentGameIndex, (int)stars);
     }
 
 	// Use this for initialization
-    void PuzzleComplete(int puzzleIndex, int stars)
+    static void PuzzleComplete(int puzzleIndex, int stars)
     {
         Puzzle puzzle;
-        puzzle.name = puzzles[puzzleIndex].name;
-        puzzle.stars = Mathf.Max(stars, puzzles[puzzleIndex].stars);
+        puzzle.name = Puzzles.Obj[puzzleIndex].name;
+        puzzle.stars = Mathf.Max(stars, Puzzles.Obj[puzzleIndex].stars);
         puzzle.unlocked = true;
-        puzzle.prefab = puzzles[puzzleIndex].prefab;
+        puzzle.prefab = Puzzles.Obj[puzzleIndex].prefab;
 
-        if (puzzles[puzzleIndex].stars < stars)
+        if (Puzzles.Obj[puzzleIndex].stars < stars)
         {
-            PlayerPrefs.SetInt(puzzles[puzzleIndex].name + "stars", puzzle.stars);
+            PlayerPrefs.SetInt(Puzzles.Obj[puzzleIndex].name + "stars", puzzle.stars);
         }
-        if(puzzleIndex < puzzles.Count - 1)
-            PlayerPrefs.SetInt(puzzles[puzzleIndex + 1].name + "unlocked", 1);
+        if(puzzleIndex < Puzzles.Obj.Count - 1)
+            PlayerPrefs.SetInt(Puzzles.Obj[puzzleIndex + 1].name + "unlocked", 1);
 	}
 
 
     internal static void UnlockAll()
     {
-        for (int i = 0; i < Puzzles.Count; i++)
+        for (int i = 0; i < Puzzles.Obj.Count; i++)
         {
-            Driver.currentGameIndex = i;
-            Instance.UISignals.Invoke(Signal.PuzzleComplete, 3);
+            Game.currentGameIndex = i;
+            Signals.Invoke(ESignalType.PuzzleComplete, 3);
             //Instance.PuzzleComplete(i, 3);
         }
     }

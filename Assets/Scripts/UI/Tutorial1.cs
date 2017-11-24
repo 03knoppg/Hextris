@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 public class Tutorial1 : UIThing {
 
@@ -9,12 +7,12 @@ public class Tutorial1 : UIThing {
     new void Start()
     {
         base.Start();
-        UISignals.AddListeners(OnBoardSelect, new List<Signal>() { Signal.GameStart, Signal.ShowBoardSelect, Signal.PlayerWin });
+        Signals.AddListeners(OnBoardSelect, new List<ESignalType>() { ESignalType.GameStart, ESignalType.SelectBoard, ESignalType.PlayerWin });
     }
 
-    void OnBoardSelect(Signal signal, object arg1)
+    void OnBoardSelect(ESignalType signal, object arg1)
     {
-        if (signal == Signal.GameStart)
+        if (signal == ESignalType.GameStart)
         {
             if (((int)arg1) == level)
                 State = UIStates.State.Active;

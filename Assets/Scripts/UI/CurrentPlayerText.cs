@@ -8,12 +8,12 @@ public class CurrentPlayerText : UIThing {
     new void Start()
     {
         base.Start();
-        UISignals.AddListeners(OnPlayerChange, new List<Signal>(){Signal.PlayerTurn}); 
+        Signals.AddListeners(OnPlayerChange, new List<ESignalType>(){ESignalType.PlayerTurn}); 
     }
 
-    void OnPlayerChange(Signal Signal, object playerIndexObj)
+    void OnPlayerChange(ESignalType Signal, object playerIndexObj)
     {
-        if(Signal == global::Signal.PlayerTurn)
+        if(Signal == global::ESignalType.PlayerTurn)
             GetComponentInChildren<Text>().text = "Player " + (((int)playerIndexObj) + 1) + "'s turn";
     }
 }

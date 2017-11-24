@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 [SelectionBase, Serializable] 
@@ -26,6 +24,14 @@ public class GameHex : MonoBehaviour
     public event CollisionExit OnCollisionExit;
 
     public int layer = 0;
+
+    public CircularBounds Bounds
+    {
+        get
+        {
+            return new CircularBounds(transform.position, Game.currentGame.layoutSize * .85f);
+        }
+    }
 
     public bool IsPivotHex
     {
@@ -60,10 +66,8 @@ public class GameHex : MonoBehaviour
     
     void OnMouseDown()
     {
-        if (OnHexMouseDown != null)
-            OnHexMouseDown(this);
+        OnHexMouseDown?.Invoke(this);
     }
-
     //positive increments of 60 degrees clockwise
     public void Rotate(int amount)
     {
@@ -96,14 +100,12 @@ public class GameHex : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (OnCollision != null)
-            OnCollision();
+        OnCollision?.Invoke();
     }
 
     void OnTriggerExit(Collider other)
     {
-        if (OnCollisionExit != null)
-            OnCollisionExit();
+        OnCollisionExit?.Invoke();
     }
 
     public static bool operator ==(GameHex a, GameHex b)

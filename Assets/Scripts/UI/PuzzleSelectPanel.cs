@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class PuzzleSelectPanel : UIThing {
 
@@ -10,26 +8,28 @@ public class PuzzleSelectPanel : UIThing {
     int offset = 0;
     public int buttonsPerPage = 8;
 
-    List<PuzzleSelectButton> buttons;
+    List<PuzzleSelectButton> buttons = new List<PuzzleSelectButton>();
 
     public UIButton nextButton;
     public UIButton prevButton;
 
     List<Puzzle> puzzles;
 
-	// Use this for initialization
-	new void Start () {
-        base.Start();
+    protected override void OnStateChanged(UIStates.State newState)
+    {
+        switch (newState)
+        {
+            case UIStates.State.Active:
+                RepopulateButtons();
+                break;
+        }
 
-        buttons = new List<PuzzleSelectButton>();
-
-        RepopulateButtons();
-        
-	}
+        base.OnStateChanged(newState);
+    }
 
     void RepopulateButtons()
     {
-        puzzles = Progression.Puzzles;
+        puzzles = Progression.Puzzles.Obj;
 
         foreach (PuzzleSelectButton button in buttons)
             Destroy(button.gameObject);
@@ -38,7 +38,7 @@ public class PuzzleSelectPanel : UIThing {
 
         for (int i = buttonsPerPage * offset; i < Mathf.Min(puzzles.Count, buttonsPerPage * (offset + 1)); i++)
         {
-            PuzzleSelectButton button = Instantiate<PuzzleSelectButton>(PuzzleSelectButtonPrefab);
+            PuzzleSelectButton button = Instantiate(PuzzleSelectButtonPrefab);
             button.levelIndex = i;
             button.SetText(puzzles[i].name);
             button.transform.SetParent(transform);

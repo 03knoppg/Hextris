@@ -1,6 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Animator)), RequireComponent(typeof(CanvasGroup))]
 public class UIThing : MonoBehaviour {
@@ -10,7 +8,6 @@ public class UIThing : MonoBehaviour {
     public UIStates.State State { get { return state; } set { OnStateChanged(value); } }
     public UIStates.Group group;
     protected UIStates UIState;
-    protected Signals UISignals;
 
     Animator animator;
     
@@ -19,21 +16,17 @@ public class UIThing : MonoBehaviour {
     protected void Awake()
     {
         animator = gameObject.GetComponent<Animator>();
-
-        UIState = FindObjectOfType<UIStates>();
-        UISignals = FindObjectOfType<Signals>();
+        if (group != UIStates.Group.None)
+            UIStates.GetEvent(group).AddListener(OnStateChanged);
     }
 
     protected void Start()
     {
-        if (group != UIStates.Group.None)
-            UIState.GetEvent(group).AddListener(OnStateChanged);
+
         //force animator into startstate
         UIStates.State startState = state;
         state = UIStates.State.None;
         OnStateChanged(startState);
-
-
 	}
 
     protected virtual void OnStateChanged(UIStates.State newState)

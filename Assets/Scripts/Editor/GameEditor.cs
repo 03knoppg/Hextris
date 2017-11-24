@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEditor;
+﻿using UnityEditor;
 
 [CustomEditor(typeof(Game))]
 public class GameEditor : Editor
@@ -9,7 +7,7 @@ public class GameEditor : Editor
     void OnSceneGUI()
     {
         Game game = target as Game;
-        if(game == null || game.type != Game.GameType.Puzzle)
+        if(game == null || game.numPlayers > 1)
             return;
 
         game.name = "Puzzle" + game.order;

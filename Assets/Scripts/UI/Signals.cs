@@ -1,42 +1,47 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.Events;
+﻿using System;
 using System.Collections.Generic;
-using System;
+using UnityEngine;
+using UnityEngine.Events;
 
-public enum Signal
+public enum ESignalType
 {
     None,
     EndTurn,
     RotateCW,
     RotateUndo,
     RotateCCW,
+    StartPuzzle,
     SelectBoard,
-    ShowBoardSelect,
     Quit,
     PlayerTurn,
     PlayerWin,
     Restart,
-    CamPosition,
+    CamPosition, // arg1 => board bounds
     GameStart,
-    PuzzleComplete
+    PuzzleComplete, // arg1 => stars
+    PuzzleMode,
+    PvPMode,
+    SetupComplete,
+    PieceSelected
 };
 
-public class Signals : MonoBehaviour
+
+public class Signals
 {
+    public class UIButtonClick : UnityEvent<ESignalType> { };
+    public class UIButtonClickOne : UnityEvent<ESignalType, object> { };
+    public class UIButtonClickTwo : UnityEvent<ESignalType, object, object> { };
+    static Dictionary<ESignalType, UIButtonClick> buttonActions = new Dictionary<ESignalType, UIButtonClick>();
+    static Dictionary<ESignalType, UIButtonClickOne> buttonActionsOne = new Dictionary<ESignalType, UIButtonClickOne>();
+    static Dictionary<ESignalType, UIButtonClickTwo> buttonActionsTwo = new Dictionary<ESignalType, UIButtonClickTwo>();
 
-    public class UIButtonClick : UnityEvent<Signal> { };
-    public class UIButtonClickOne : UnityEvent<Signal, object> { };
-    public class UIButtonClickTwo : UnityEvent<Signal, object, object> { };
-    Dictionary<Signal, UIButtonClick> buttonActions = new Dictionary<Signal, UIButtonClick>();
-    Dictionary<Signal, UIButtonClickOne> buttonActionsOne = new Dictionary<Signal, UIButtonClickOne>();
-    Dictionary<Signal, UIButtonClickTwo> buttonActionsTwo = new Dictionary<Signal, UIButtonClickTwo>();
 
-    void Awake()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Init()
     {
-        foreach (Signal button in Enum.GetValues(typeof(Signal)))
+        foreach (ESignalType button in Enum.GetValues(typeof(ESignalType)))
         {
-            if (button != Signal.None)
+            if (button != ESignalType.None)
             {
                 buttonActions[button] = new UIButtonClick();
                 buttonActionsOne[button] = new UIButtonClickOne();
@@ -45,32 +50,59 @@ public class Signals : MonoBehaviour
         }
     }
 
-    public void AddListeners(UnityAction<Signal> UIClick, List<Signal> list)
+    public static void AddListeners(UnityAction<ESignalType> UIClick, List<ESignalType> list)
     {
-        foreach (Signal button in list)
+        foreach (ESignalType button in list)
             buttonActions[button].AddListener(UIClick);
     }
-    public void AddListeners(UnityAction<Signal, object> UIClick, List<Signal> list)
+    public static void AddListeners(UnityAction<ESignalType, object> UIClick, List<ESignalType> list)
     {
-        foreach (Signal button in list)
+        foreach (ESignalType button in list)
             buttonActionsOne[button].AddListener(UIClick);
     }
-    public void AddListeners(UnityAction<Signal, object, object> UIClick, List<Signal> list)
+    public static void AddListeners(UnityAction<ESignalType, object, object> UIClick, List<ESignalType> list)
     {
-        foreach (Signal button in list)
+        foreach (ESignalType button in list)
             buttonActionsTwo[button].AddListener(UIClick);
     }
-
-    public void Invoke(Signal button, object arg1 = null, object arg2 = null)
+    public static void RemoveListeners(UnityAction<ESignalType> UIClick, List<ESignalType> list)
     {
-        if (button == Signal.None)
+        foreach (ESignalType button in list)
+            buttonActions[button].RemoveListener(UIClick);
+    }
+    public static void RemoveListeners(UnityAction<ESignalType, object> UIClick, List<ESignalType> list)
+    {
+        foreach (ESignalType button in list)
+            buttonActionsOne[button].RemoveListener(UIClick);
+    }
+    public static void RemoveListeners(UnityAction<ESignalType, object, object> UIClick, List<ESignalType> list)
+    {
+        foreach (ESignalType button in list)
+            buttonActionsTwo[button].RemoveListener(UIClick);
+    }
+
+    public static void Invoke(ESignalType button, params object[] args)
+    {
+        string debug = button.ToString();
+
+        foreach (object arg in args)
+        {
+            if (arg != null)
+                debug += " " + arg.ToString();
+            else
+                debug += " NULL"; 
+        }
+
+        Debug.Log(debug + " " + Time.frameCount);
+
+        if (button == ESignalType.None)
             return;
 
-        if (arg1 == null)
+        if (args.Length == 0)
             buttonActions[button].Invoke(button);
-        else if (arg2 == null)
-            buttonActionsOne[button].Invoke(button, arg1);
+        else if (args.Length == 1)
+            buttonActionsOne[button].Invoke(button, args[0]);
         else
-            buttonActionsTwo[button].Invoke(button, arg1, arg2);
+            buttonActionsTwo[button].Invoke(button, args[0], args[1]);
     }
 }

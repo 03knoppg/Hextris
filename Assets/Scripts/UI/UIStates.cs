@@ -1,10 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
-using System;
 
-public class UIStates : MonoBehaviour {
+public class UIStates {
 
     public enum State
     {
@@ -25,13 +24,11 @@ public class UIStates : MonoBehaviour {
     };
 
     public class UIStateChange : UnityEvent<State> { };
-    Dictionary<Group, UIStateChange> GroupStateChanges = new Dictionary<Group, UIStateChange>();
+    static Dictionary<Group, UIStateChange> GroupStateChanges = new Dictionary<Group, UIStateChange>();
 
-    //public int winner;
-    //public int currentPlayer;
 
-	// Use this for initialization
-	void Awake () {
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void Init () {
         foreach (Group group in Enum.GetValues(typeof(Group)))
         {
             if(group != Group.None)
@@ -39,12 +36,12 @@ public class UIStates : MonoBehaviour {
         }
 	}
 
-    public void SetGroupState(Group group, State state)
+    public static void SetGroupState(Group group, State state)
     {
         GroupStateChanges[group].Invoke(state);
     }
 
-    public UIStateChange GetEvent(Group group)
+    public static UIStateChange GetEvent(Group group)
     {
         return GroupStateChanges[group];
     }

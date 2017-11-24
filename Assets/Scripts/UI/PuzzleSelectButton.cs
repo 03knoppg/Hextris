@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 public class PuzzleSelectButton : UIButton {
 
@@ -11,28 +9,28 @@ public class PuzzleSelectButton : UIButton {
     protected new void Start()
     {
         base.Start();
-        if (Progression.Puzzles[levelIndex].unlocked)
+        if (Progression.Puzzles.Obj[levelIndex].unlocked)
             State = UIStates.State.Active;
         else
             State = UIStates.State.Disabled;
 
-        UISignals.AddListeners(OnSignalOne, new List<Signal>() { Signal.PuzzleComplete });
+        Signals.AddListeners(OnSignalOne, new List<ESignalType>() { ESignalType.PuzzleComplete });
     }
 
-    private void OnSignalOne(Signal signal, object arg1)
+    private void OnSignalOne(ESignalType signal, object arg1)
     {
-        if (signal == Signal.PuzzleComplete)
+        if (signal == ESignalType.PuzzleComplete)
         {
-            if(Driver.currentGameIndex == levelIndex)
+            if(Game.currentGameIndex == levelIndex)
                 stars = (int)arg1;
-            else if(Driver.currentGameIndex == levelIndex - 1)
+            else if(Game.currentGameIndex == levelIndex - 1)
                 State = UIStates.State.Active;
         }
     }
 
     protected override void Click()
     {
-        UISignals.Invoke(signal, levelIndex);
+        Signals.Invoke(signal, levelIndex);
     }
 
     public void SetText(string text)

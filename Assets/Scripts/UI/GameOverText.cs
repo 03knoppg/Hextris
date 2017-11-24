@@ -8,12 +8,12 @@ public class GameOverText : UIThing {
     new void Start()
     {
         base.Start();
-        UISignals.AddListeners(OnPlayerChange, new List<Signal>() { Signal.PlayerWin });
+        Signals.AddListeners(OnPlayerChange, new List<ESignalType>() { ESignalType.PlayerWin });
     }
 
-    void OnPlayerChange(Signal Signal, object playerIndexObj)
+    void OnPlayerChange(ESignalType Signal, object playerIndexObj)
     {
-        if (Signal == global::Signal.PlayerWin)
+        if (Signal == global::ESignalType.PlayerWin)
             GetComponentInChildren<Text>().text = "Player " + (((int)playerIndexObj) + 1) + " Wins!";
     }
 

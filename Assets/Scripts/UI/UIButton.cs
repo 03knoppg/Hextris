@@ -1,21 +1,22 @@
-﻿using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 
 public class UIButton : UIThing {
 
-    public Signal signal;
+    public ESignalType signal;
+
+    protected Button button;
 
 	// Use this for initialization
     protected new void Start()
     {
         base.Start();
 
-        GetComponentInChildren<Button>().onClick.AddListener(Click);
+        button = GetComponentInChildren<Button>();
+        button.onClick.AddListener(Click);
 	}
 
     protected virtual void Click()
     {
-        UISignals.Invoke(signal);
+        Signals.Invoke(signal);
     }
 }
