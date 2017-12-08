@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class HextrisStateMachineBehaviour : DTStateMachineBehaviour<HextrisStateMachine>
+public class HextwistStateMachineBehaviour : DTStateMachineBehaviour<HextwistStateMachine>
 {
     List<ESignalType> SignalTypes;
     List<ESignalType> SignalTypesOne;

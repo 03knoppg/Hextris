@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class StateSetup : HextrisStateMachineBehaviour
+public class StateSetup : HextwistStateMachineBehaviour
 {
     protected override void OnEnter()
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HextrisStateMachine : MonoBehaviour {
+public class HextwistStateMachine : MonoBehaviour {
 
 
     public enum EGameType
@@ -12,7 +12,7 @@ public class HextrisStateMachine : MonoBehaviour {
         Puzzle = 2
     }
 
-    static HextrisStateMachine singleton;
+    static HextwistStateMachine singleton;
 
     [SerializeField]
     Animator animator;

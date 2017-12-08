@@ -1,6 +1,6 @@
 ﻿using UnityEngine.SceneManagement;
 
-public class StateQuit : HextrisStateMachineBehaviour {
+public class StateQuit : HextwistStateMachineBehaviour {
 
     protected override void OnEnter()
     {

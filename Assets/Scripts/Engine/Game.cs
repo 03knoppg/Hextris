@@ -420,7 +420,7 @@ public class Game : MonoBehaviour {
         currentGame?.End();
 
 
-        if (HextrisStateMachine.GameType == HextrisStateMachine.EGameType.Puzzle)
+        if (HextwistStateMachine.GameType == HextwistStateMachine.EGameType.Puzzle)
         {
             currentGameIndex = index ?? ++currentGameIndex;
 

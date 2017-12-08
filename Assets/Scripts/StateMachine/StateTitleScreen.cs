@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class StateTitleScreen : HextrisStateMachineBehaviour { 
+public class StateTitleScreen : HextwistStateMachineBehaviour { 
 
     protected override void OnEnter()
     {
         AddListeners(new List<ESignalType> { ESignalType.PuzzleMode, ESignalType.PvPMode, ESignalType.ClearProgression });
 
-        HextrisStateMachine.GameType = HextrisStateMachine.EGameType.Unselected;
+        HextwistStateMachine.GameType = HextwistStateMachine.EGameType.Unselected;
     }
 
     protected override void OnSignal(ESignalType signalType)
@@ -15,12 +15,12 @@ public class StateTitleScreen : HextrisStateMachineBehaviour {
         switch (signalType)
         {
             case ESignalType.PuzzleMode:
-                HextrisStateMachine.GameType = HextrisStateMachine.EGameType.Puzzle;
+                HextwistStateMachine.GameType = HextwistStateMachine.EGameType.Puzzle;
                 //SMTransition(signalType);
                 SceneManager.LoadScene("Game");
                 break;
             case ESignalType.PvPMode:
-                HextrisStateMachine.GameType = HextrisStateMachine.EGameType.PvP;
+                HextwistStateMachine.GameType = HextwistStateMachine.EGameType.PvP;
                 //SMTransition(signalType);
                 SceneManager.LoadScene("Game");
                 break;

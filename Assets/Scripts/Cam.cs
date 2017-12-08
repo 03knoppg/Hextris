@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class HextrisCam : MonoBehaviour {
+public class Cam : MonoBehaviour {
 
     //Vector3 oldMousePos;
     float hDist;

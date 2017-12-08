@@ -6,8 +6,8 @@ public class Progression
     public static Game PvPGamePrefab;
 
     public static List<Game> Puzzles {
-        get { return HextrisStateMachine.Puzzles; }
-        set { HextrisStateMachine.Puzzles = value; }
+        get { return HextwistStateMachine.Puzzles; }
+        set { HextwistStateMachine.Puzzles = value; }
     }
 
     public static void Init(Animator animator)

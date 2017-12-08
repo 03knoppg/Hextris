@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class StateBoardSelect : HextrisStateMachineBehaviour
+public class StateBoardSelect : HextwistStateMachineBehaviour
 {
     protected override void OnEnter()
     {
