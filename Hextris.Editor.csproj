@@ -277,6 +277,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\3rdParty\SceneAutoLoader\Editor\SceneAutoLoader.cs" />
     <Compile Include="Assets\3rdParty\ScriptableObejctFactory\Editor\ScriptableObjectFactory.cs" />
     <Compile Include="Assets\3rdParty\ScriptableObejctFactory\Editor\ScriptableObjectWindow.cs" />
     <Compile Include="Assets\Scripts\Editor\GameEditor.cs" />

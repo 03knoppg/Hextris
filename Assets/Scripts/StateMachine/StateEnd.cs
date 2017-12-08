@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-public class StatePuzzleEnd : HextrisStateMachineBehaviour
+public class StateEnd : HextrisStateMachineBehaviour
 {
 
     protected override void OnEnter()
@@ -9,7 +9,7 @@ public class StatePuzzleEnd : HextrisStateMachineBehaviour
         UIStates.SetGroupState(UIStates.Group.PieceControls, UIStates.State.Disabled);
         UIStates.SetGroupState(UIStates.Group.Undo, UIStates.State.Disabled);
 
-        AddListeners(new List<ESignalType> { ESignalType.StartPuzzle, ESignalType.SelectBoard });
+        AddListeners(new List<ESignalType> { ESignalType.StartPuzzle, ESignalType.SelectBoard, ESignalType.Quit });
 
         Game.currentGame.SetPieceModeEnd();
         foreach (Player player in Game.currentGame.players)
@@ -25,11 +25,15 @@ public class StatePuzzleEnd : HextrisStateMachineBehaviour
             case ESignalType.StartPuzzle:
                 UIStates.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
                 Game.SelectGame();
-                Animator.SetTrigger(signalType.ToString());
+                SMTransition(signalType);
                 break;
             case ESignalType.SelectBoard:
                 UIStates.SetGroupState(UIStates.Group.EndGame, UIStates.State.Hidden);
-                Animator.SetTrigger(signalType.ToString());
+                SMTransition(signalType);
+                break;
+
+            case ESignalType.Quit:
+                SMTransition(signalType);
                 break;
         }
     }

@@ -22,7 +22,8 @@ public enum ESignalType
     PuzzleMode,
     PvPMode,
     SetupComplete,
-    PieceSelected
+    PieceSelected,
+    ClearProgression
 };
 
 
@@ -93,7 +94,7 @@ public class Signals
                 debug += " NULL"; 
         }
 
-        Debug.Log(debug + " " + Time.frameCount);
+        Debug.Log(debug);
 
         if (button == ESignalType.None)
             return;

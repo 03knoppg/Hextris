@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
-public class StatePuzzleMain : HextrisStateMachineBehaviour {
+public class StateMain : HextrisStateMachineBehaviour {
 
     protected override void OnEnter()
     {
@@ -56,7 +55,7 @@ public class StatePuzzleMain : HextrisStateMachineBehaviour {
         switch(signalType)
         {
             case ESignalType.PuzzleComplete:
-                Animator.SetTrigger("End");
+                SMTransition(signalType);
                 break;
         }
     }

@@ -8,12 +8,6 @@ public class Game : MonoBehaviour {
 
     public float order;
 
-    public enum GameType
-    {
-        Classic,
-        Puzzle
-    }
-
     [Serializable]
     public struct PieceData
     {
@@ -46,6 +40,31 @@ public class Game : MonoBehaviour {
     
     public float layoutSize = 1;
     public int numPlayers = 1;
+    
+    public bool Unlocked
+    {
+        get
+        {
+            return PlayerPrefs.GetInt(name + "unlocked", 0) == 1;
+        }
+        set
+        {
+            PlayerPrefs.SetInt(name + "unlocked", value ? 1 : 0);
+
+        }
+    }
+
+    public int Stars
+    {
+        get
+        {
+            return PlayerPrefs.GetInt(name + "stars", 0);
+        }
+        set
+        {
+            PlayerPrefs.SetInt(name + "stars", value);
+        }
+    }
 
     public void Init()
     {
@@ -379,7 +398,11 @@ public class Game : MonoBehaviour {
 
     public void End()
     {
-        Destroy(currentBoard.gameObject);
+        if(currentBoard)
+            Destroy(currentBoard.gameObject);
+
+        currentBoard = null;
+        currentGame = null;
 
         foreach (Player player in players)
         {
@@ -387,6 +410,7 @@ public class Game : MonoBehaviour {
         }
 
         Destroy(gameObject);
+
     }
 
     public static Game currentGame;
@@ -395,9 +419,17 @@ public class Game : MonoBehaviour {
     {
         currentGame?.End();
 
-        currentGameIndex = index ?? ++currentGameIndex;
 
-        currentGame = ObjectFactory.Game(Progression.Puzzles.Obj[currentGameIndex].prefab);
+        if (HextrisStateMachine.GameType == HextrisStateMachine.EGameType.Puzzle)
+        {
+            currentGameIndex = index ?? ++currentGameIndex;
+
+            currentGame = ObjectFactory.Game(Progression.Puzzles[currentGameIndex]);
+        }
+        else
+        {
+            currentGame = ObjectFactory.Game(Progression.PvPGamePrefab);
+        }
 
         Signals.Invoke(ESignalType.CamPosition, currentGame.GetBoardBounds());
         Signals.Invoke(ESignalType.GameStart, currentGameIndex);

@@ -13,7 +13,7 @@ public class NextPuzzleButton : UIButton {
 	{
 		if (signal == ESignalType.StartPuzzle)
 		{
-			if (Game.currentGameIndex == (Progression.Puzzles.Obj.Count - 1))
+			if (Game.currentGameIndex == (Progression.Puzzles.Count - 1))
 				OnStateChanged(UIStates.State.Disabled);
 			
 			else

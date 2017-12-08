@@ -2,8 +2,25 @@
 
 public class DontDestroyOnLoad : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+
+    [SerializeField]
+    bool singleton;
+
+    static GameObject singletonGO;
+
+    void Awake() {
+
+        if (singleton && singletonGO)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        singletonGO = gameObject;
+
         DontDestroyOnLoad(gameObject);
+    
+        
+            
 	}
 }

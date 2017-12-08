@@ -13,7 +13,7 @@ public class PuzzleSelectPanel : UIThing {
     public UIButton nextButton;
     public UIButton prevButton;
 
-    List<Puzzle> puzzles;
+    List<Game> puzzles;
 
     protected override void OnStateChanged(UIStates.State newState)
     {
@@ -29,7 +29,7 @@ public class PuzzleSelectPanel : UIThing {
 
     void RepopulateButtons()
     {
-        puzzles = Progression.Puzzles.Obj;
+        puzzles = Progression.Puzzles;
 
         foreach (PuzzleSelectButton button in buttons)
             Destroy(button.gameObject);
@@ -43,15 +43,17 @@ public class PuzzleSelectPanel : UIThing {
             button.SetText(puzzles[i].name);
             button.transform.SetParent(transform);
             buttons.Add(button);
+
         }
 
         prevButton.State = offset > 0 ? UIStates.State.Active : UIStates.State.Disabled;
-        nextButton.State = offset < Mathf.Floor(puzzles.Count / buttonsPerPage) ? UIStates.State.Active : UIStates.State.Disabled;
+        nextButton.State = offset < Mathf.Floor(puzzles.Count / buttonsPerPage) -1 ? UIStates.State.Active : UIStates.State.Disabled;
     }
 
     public void UnlockAll()
     {
         Progression.UnlockAll();
+        RepopulateButtons();
     }
 
     public void NextPage()

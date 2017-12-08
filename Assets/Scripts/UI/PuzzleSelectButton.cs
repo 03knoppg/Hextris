@@ -9,7 +9,8 @@ public class PuzzleSelectButton : UIButton {
     protected new void Start()
     {
         base.Start();
-        if (Progression.Puzzles.Obj[levelIndex].unlocked)
+
+        if (Progression.Puzzles[levelIndex].Unlocked)
             State = UIStates.State.Active;
         else
             State = UIStates.State.Disabled;

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
-public class BoardSelect : HextrisStateMachineBehaviour
+public class StateBoardSelect : HextrisStateMachineBehaviour
 {
     protected override void OnEnter()
     {
@@ -29,7 +28,12 @@ public class BoardSelect : HextrisStateMachineBehaviour
 
     protected override void OnSignalOne(ESignalType signalType, object index)
     {
-        Game.SelectGame((int)index);
-        Animator.SetTrigger("StartPuzzle");
+        switch(signalType)
+        {
+            case ESignalType.StartPuzzle:
+                Game.SelectGame((int)index);
+                SMTransition(signalType);
+                break;
+        }
     }
 }
